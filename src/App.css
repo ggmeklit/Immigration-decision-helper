@@ -1,0 +1,131 @@
+:root{
+  --green:#004D40;
+  --green-900:#003d33;
+  --gold:#FFB300;
+}
+
+/* brand colors */
+.text-primary-dark-green{ color:var(--green)!important; }
+.bg-primary-dark-green{ background:var(--green)!important; }
+
+/* hero gradient + placeholder boxes */
+.bg-hero-gradient{
+  background: linear-gradient(to right, #004D40, #4CAF50);
+}
+.placeholder-image{
+  height:400px;
+  border-radius:1rem;
+  border:2px dashed rgba(0,0,0,.15);
+  background:#e5e7eb;
+}
+
+/* buttons (map to your variants used in App.jsx) */
+.btn-main{
+  background:var(--green);
+  color:#fff;
+  border: none;
+}
+.btn-main:hover{ background:var(--green-900); color:#fff; }
+
+.btn-accent{
+  background:var(--gold);
+  color:var(--green);
+  border:none;
+}
+.btn-accent:hover{
+  filter: brightness(0.95);
+  color:var(--green);
+}
+
+.btn-outline-white{
+  background:transparent;
+  color:#fff;
+  border:2px solid #fff;
+}
+.btn-outline-white:hover{
+  background:#fff;
+  color:var(--green);
+}
+
+/* cards hover */
+.card-hover{ transition: box-shadow .2s, transform .2s; }
+.card-hover:hover{ box-shadow:0 .75rem 2rem rgba(0,0,0,.12); transform: translateY(-2px); }
+
+/* utility tweaks */
+.opacity-90{ opacity:.9; }
+.fw-medium{ font-weight:500; }
+
+/* === CHAT WIDGET STYLES === */
+.chat-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  border: none;
+  background: #0b5d4b; /* primary dark green */
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  z-index: 1050;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+.chat-fab:hover {
+  opacity: 0.95;
+}
+
+.chat-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 86px;
+  width: 320px;
+  max-height: 60vh;
+  overflow: auto;
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  z-index: 1050;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.chat-link {
+  display: inline-block;
+  width: 100%;
+  text-align: left;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  background: #fff;
+  color: #0b5d4b;
+  font-weight: 600;
+  cursor: pointer;
+}
+.chat-link + .chat-link {
+  margin-top: 8px;
+}
+.chat-link:hover {
+  background: #f6f9f8;
+}
+
+a {
+  color: blue;
+}
+
+a:visited {
+  color: purple;
+}
+
+a:hover {
+  color: darkblue;
+}
+
+a:active {
+  color: red;
+}
+
+
+
