@@ -1,23 +1,16 @@
-# Immigration ML Project
+# React + Vite
 
-A student project for the MIT Emerging Talent program — building a simple web platform that helps newcomers, students, and families find the right support: immigration guidance, education advising, housing and job referrals, financial and mortgage advice, and life coaching.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## 🗓 Project Timeline (6 Weeks)
+Currently, two official plugins are available:
 
-1. **Planning & Design** – define MVP, wireframes, and roles  
-2. **Landing & Services** – homepage and overview pages  
-3. **Service Details** – content and search  
-4. **Forms & Booking** – contact and intake forms  
-5. **Admin & Reporting** – view/export submissions  
-6. **Final Touches** – polish, test, and present MVP  
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## ⚙️ Tech Stack
+## React Compiler
 
-- **Frontend:** React + Vite + Tailwind  
-- **Backend:** FastAPI + SQLite  
-- **Tools:** GitHub, VS Code, Teams, Planner  
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## 👩‍💻 Team
+## Expanding the ESLint configuration
 
-Group project for the MIT Emerging Talent Program
-Contributors: Semira, Meklit, Anna
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
