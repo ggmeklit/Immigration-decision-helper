@@ -225,18 +225,36 @@ const App = () => {
 
   // === FORM SUBMIT HANDLERS (YOUR ORIGINAL) ===
   // This handles Immigration form submit and shows a success message
-  const handleImmigrationSubmit = (e) => {
-    e.preventDefault();
-    setImmigrationFormSubmitted(true);
-    setTimeout(() => {
-      setImmigrationFormSubmitted(false);
+  const handleImmigrationSubmit = async (e) => {
+  e.preventDefault();
+  setImmigrationFormSubmitted(false); // reset before sending
+
+  try {
+    const response = await fetch("http://localhost:3001/api/assessment", { 
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(immigrationFormData),
+    }); 
+
+    const data = await response.json();
+
+    if (data.success) {
+      setImmigrationFormSubmitted(true);
+      alert("✅ Your assessment report has been sent to your email!");
       setImmigrationFormData({
         fullName: '', email: '', age: '', education: '', workExperience: '',
         languageProficiency: '', currentCountry: '', intendedProvince: '',
         familyInCanada: '', budget: ''
       });
-    }, 5000);
-  };
+    } else {
+      alert("❌ Something went wrong. Please try again.");
+    }
+  } catch (err) {
+    console.error("Error submitting form:", err);
+    alert("⚠️ Unable to reach the server. Make sure it’s running.");
+  }
+};
+
   // This handles Mortgage form submit and shows a success message
   const handleMortgageSubmit = (e) => {
     e.preventDefault();
