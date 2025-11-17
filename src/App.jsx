@@ -18,7 +18,7 @@ import {
 import './App.css';
 import emailjs from '@emailjs/browser';
 import { supabase } from "./superbase";
-const keyMoment = new URL('/newcomers_canada_group_toronto.png', import.meta.url).href;
+import keyMoment from "./newcomers_canada_group_toronto.png";
 
 
 // === EMAILJS CONFIG (Contact form only) ===
