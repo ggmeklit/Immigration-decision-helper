@@ -1,8 +1,9 @@
 {
   "name": "real-site",
+  "type": "module",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
+  "proxy": "http://localhost:3001",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -11,8 +12,16 @@
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
+    "@supabase/supabase-js": "^2.81.1",
     "bootstrap": "^5.3.8",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "emailjs": "^4.0.3",
+    "express": "^5.1.0",
     "lucide-react": "^0.545.0",
+    "node-fetch": "^3.3.2",
+    "nodemailer": "^7.0.10",
+    "openai": "^6.8.1",
     "react": "^19.1.1",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.1.1"

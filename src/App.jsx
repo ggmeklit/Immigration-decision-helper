@@ -17,6 +17,9 @@ import {
 // Keep your CSS import
 import './App.css';
 import emailjs from '@emailjs/browser';
+import { supabase } from "./superbase";
+const keyMoment = "/newcomers_canada_group_toronto.png";
+
 
 // === EMAILJS CONFIG (Contact form only) ===
 // Replace YOUR_TEMPLATE_ID and YOUR_PUBLIC_KEY with your EmailJS values
@@ -66,6 +69,8 @@ const App = () => {
   const [contactSent, setContactSent] = useState(false);
   const [contactError, setContactError] = useState('');
 
+
+
   // === CONTENT DATA (YOUR ORIGINAL) ===
   // All service content lives here and is used across pages
   const services = [
@@ -90,7 +95,7 @@ const App = () => {
     {
       id: 'mortgage',
       title: 'Mortgage Finance',
-      description: 'Newcomer Mortgages, First-Time Home Buyer Guidance',
+      
       icon: 'bi-credit-card',
       details: {
         features: [
@@ -226,49 +231,115 @@ const App = () => {
   // === FORM SUBMIT HANDLERS (YOUR ORIGINAL) ===
   // This handles Immigration form submit and shows a success message
   const handleImmigrationSubmit = async (e) => {
-  e.preventDefault();
-  setImmigrationFormSubmitted(false); // reset before sending
+    e.preventDefault();
+    setImmigrationFormSubmitted(false);
 
-  try {
-    const response = await fetch("http://localhost:3001/api/assessment", { 
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(immigrationFormData),
-    }); 
+    try {
+      // Insert into Supabase
+      const { error } = await supabase
+        .from("immigration_forms")
+        .insert([
+          {
+            full_name: immigrationFormData.fullName,
+            email: immigrationFormData.email,
+            age: immigrationFormData.age,
+            education: immigrationFormData.education,
+            work_experience: immigrationFormData.workExperience,
+            language_proficiency: immigrationFormData.languageProficiency,
+            current_country: immigrationFormData.currentCountry,
+            intended_province: immigrationFormData.intendedProvince,
+            family_in_canada: immigrationFormData.familyInCanada,
+            budget: immigrationFormData.budget,
+          }
+        ]);
 
-    const data = await response.json();
+      if (error) {
+        console.error("Insert error:", error);
+        alert("❌ Something went wrong saving your form.");
+        return;
+      }
 
-    if (data.success) {
+      // Success
       setImmigrationFormSubmitted(true);
-      alert("✅ Your assessment report has been sent to your email!");
+      alert("✅ Your assessment report has been saved!");
+
       setImmigrationFormData({
-        fullName: '', email: '', age: '', education: '', workExperience: '',
-        languageProficiency: '', currentCountry: '', intendedProvince: '',
-        familyInCanada: '', budget: ''
+        fullName: "",
+        email: "",
+        age: "",
+        education: "",
+        workExperience: "",
+        languageProficiency: "",
+        currentCountry: "",
+        intendedProvince: "",
+        familyInCanada: "",
+        budget: "",
       });
-    } else {
-      alert("❌ Something went wrong. Please try again.");
+
+    } catch (err) {
+      console.error("Error submitting form:", err);
+      alert("⚠️ Something went wrong. Try again later.");
     }
-  } catch (err) {
-    console.error("Error submitting form:", err);
-    alert("⚠️ Unable to reach the server. Make sure it’s running.");
-  }
-};
+  };   // ✅ THIS BRACE WAS MISSING
+
 
   // This handles Mortgage form submit and shows a success message
-  const handleMortgageSubmit = (e) => {
-    e.preventDefault();
-    setMortgageFormSubmitted(true);
-    setTimeout(() => {
-      setMortgageFormSubmitted(false);
-      setMortgageFormData({
-        fullName: '', email: '', phone: '', employmentStatus: '', annualIncome: '',
-        creditScore: '', downPayment: '', propertyType: '', propertyLocation: '',
-        firstTimeBuyer: '', newcomerStatus: ''
-      });
-    }, 5000);
-  };
+  
 
+  // === CONTACT SUBMIT HANDLER (EmailJS - NEW) ===
+
+
+const handleMortgageSubmit = async (e) => {
+  e.preventDefault();
+
+  // INSERT INTO SUPABASE
+  const { data, error } = await supabase
+    .from('mortgage_forms')
+    .insert([
+      {
+        full_name: mortgageFormData.fullName,
+        email: mortgageFormData.email,
+        phone: mortgageFormData.phone,
+        employment_status: mortgageFormData.employmentStatus,
+        income: mortgageFormData.annualIncome,
+        credit_score: mortgageFormData.creditScore,
+        down_payment: mortgageFormData.downPayment,
+        property_type: mortgageFormData.propertyType,
+        location: mortgageFormData.propertyLocation,
+        first_time_buyer: mortgageFormData.firstTimeBuyer,
+        newcomer_status: mortgageFormData.newcomerStatus,
+      }
+    ]);
+
+  if (error) {
+    console.error(error);
+    alert("Could not save form to database.");
+    return;
+  }
+
+  // SUCCESS UI
+  setMortgageFormSubmitted(true);
+
+  // RESET FORM AFTER 5s
+  setTimeout(() => {
+    setMortgageFormSubmitted(false);
+    setMortgageFormData({
+      fullName: '',
+      email: '',
+      phone: '',
+      employmentStatus: '',
+      annualIncome: '',
+      creditScore: '',
+      downPayment: '',
+      propertyType: '',
+      propertyLocation: '',
+      firstTimeBuyer: '',
+      newcomerStatus: '',
+    });
+  }, 5000);
+
+  alert("Form submitted successfully!");
+};
   // === CONTACT SUBMIT HANDLER (EmailJS - NEW) ===
   const handleContactSubmit = async (e) => {
     e.preventDefault();
@@ -299,6 +370,7 @@ const App = () => {
       setContactSending(false);
     }
   };
+
 
   // === SEARCH HANDLER (UPDATED WITH INDEX) ===
   // When you type "home", "mortgage", etc., this jumps to that page.
@@ -438,10 +510,12 @@ const App = () => {
               </div>
             </Col>
             <Col lg={6}>
-              {/* Placeholder image area */}
-              <div className="placeholder-image rounded-3 border border-2 border-dashed p-4">
-                IMG-001: The Key Moment
-              </div>
+              <img
+                src={keyMoment}
+                alt="Diverse group of newcomers in Canada smiling and holding Canadian flags in Toronto skyline"
+                className="img-fluid rounded-3"
+                style={{ width: "100%", height: "auto", objectFit: "cover" }}
+              />
             </Col>
           </Row>
         </Container>
@@ -485,7 +559,7 @@ const App = () => {
       </section>
 
       {/* COMMUNITY SECTION (simple promo area) */}
-      <section className="py-5 bg-white">
+      <section className="py-5">
         <Container className="py-md-5">
           <Row className="align-items-center g-5">
             <Col lg={6}>
@@ -740,58 +814,90 @@ const App = () => {
 
   // === COACHING PAGE ===
   // This adds the Coaching page: THRIVE framework + mentors + call-to-action.
+
   const renderCoaching = () => {
-    const service = services.find(s => s.id === 'coaching');
-    return (
-      <Container className="py-5">
-        {/* TOP TITLE + DESCRIPTION */}
-        <div className="text-center mb-5">
-          <h1 className="display-4 fw-bold text-primary-dark-green mb-3">{service.title}</h1>
-          <p className="fs-5 text-muted">{service.description}</p>
-        </div>
+  const service = services.find(s => s.id === 'coaching');
+  return (
+    <Container className="py-5">
+      
+      {/* TOP TITLE + DESCRIPTION */}
+      <div className="text-center mb-5">
+        <h1 className="display-4 fw-bold text-primary-dark-green mb-3">{service.title}</h1>
+        <p className="fs-5 text-muted">{service.description}</p>
+      </div>
 
-        {/* THRIVE FRAMEWORK (6 letters / steps) */}
-        <div className="mb-5">
-          <h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">{service.details.framework.name}</h2>
-          <Row xs={1} md={2} lg={3} xl={6} className="g-4 text-center">
-            {service.details.framework.steps.map((step) => (
-              <Col key={step.letter}>
-                <div className="d-flex align-items-center justify-content-center bg-accent-yellow rounded-circle mx-auto mb-3" style={{ width: '64px', height: '64px' }}>
-                  <span className="text-primary-dark-green fw-bold fs-2">{step.letter}</span>
-                </div>
-                <h6 className="fw-bold text-primary-dark-green">{step.title}</h6>
+      {/* THRIVE FRAMEWORK (6 letters / steps) */}
+      <div className="mb-5">
+        <h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">
+          {service.details.framework.name}
+        </h2>
+
+        <Row xs={1} md={2} lg={3} xl={6} className="g-4">
+          {service.details.framework.steps.map((step) => (
+            <Col key={step.letter}>
+              <div className="thrive-card">
+                <div className="thrive-icon">{step.letter}</div>
+
+                <h6 className="fw-bold text-primary-dark-green mb-2">
+                  {step.title}
+                </h6>
+
                 <p className="text-muted small">{step.description}</p>
-              </Col>
-            ))}
-          </Row>
-        </div>
+              </div>
+            </Col>
+          ))}
+        </Row>
+      </div>
 
-        {/* MENTORS GRID (3 cards) */}
-        <div className="mb-5">
-          <h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">Meet Our Expert Coaches</h2>
-          <Row xs={1} md={3} className="g-4">
-            {service.details.mentors.map((mentor, index) => (
-              <Col key={index}>
-                <Card className="text-center h-100 shadow-sm border-light p-3">
-                  <Card.Body>
-                    <div className="placeholder-avatar mx-auto mb-3"></div>
-                    <h5 className="fw-bold text-primary-dark-green mb-1">{mentor.name}</h5>
-                    <p className="text-success fw-semibold mb-2">{mentor.role}</p>
-                    <p className="text-muted small">{mentor.expertise}</p>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </div>
+      {/* === MEET OUR EXPERT COACHES (section you were missing) === */}
+      <div className="mt-5 mb-5">
+        <h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">
+          Meet Our Expert Coaches
+        </h2>
 
-        {/* BOOKING BUTTON (CTA) */}
-        <div className="text-center">
-          <Button variant="main" size="lg" onClick={() => setActiveTab('contact')}>Book Your Coaching Session</Button>
-        </div>
-      </Container>
-    );
-  };
+        <Row xs={1} md={3} className="g-4">
+          {/* Coach 1 */}
+          <Col>
+            <Card className="text-center h-100 shadow-sm border-light p-4">
+              <div className="placeholder-avatar mx-auto mb-3"></div>
+              <h5 className="fw-bold text-primary-dark-green">Sarah Johnson</h5>
+              <p className="text-success fw-semibold mb-2">Career Coach</p>
+              <p className="text-muted small">Tech Industry, Resume Writing</p>
+            </Card>
+          </Col>
+
+          {/* Coach 2 */}
+          <Col>
+            <Card className="text-center h-100 shadow-sm border-light p-4">
+              <div className="placeholder-avatar mx-auto mb-3"></div>
+              <h5 className="fw-bold text-primary-dark-green">Michael Chen</h5>
+              <p className="text-success fw-semibold mb-2">Life Coach</p>
+              <p className="text-muted small">Cultural Integration, Confidence Building</p>
+            </Card>
+          </Col>
+
+          {/* Coach 3 */}
+          <Col>
+            <Card className="text-center h-100 shadow-sm border-light p-4">
+              <div className="placeholder-avatar mx-auto mb-3"></div>
+              <h5 className="fw-bold text-primary-dark-green">Aisha Patel</h5>
+              <p className="text-success fw-semibold mb-2">Executive Coach</p>
+              <p className="text-muted small">Leadership Development, Networking</p>
+            </Card>
+          </Col>
+        </Row>
+      </div>
+
+      {/* BOOKING BUTTON (CTA) */}
+      <div className="text-center">
+        <Button variant="main" size="lg" onClick={() => setActiveTab('contact')}>
+          Book Your Coaching Session
+        </Button>
+      </div>
+
+    </Container>
+  );
+};
 
   // === RESOURCES PAGE ===
   // This adds the Resources page: downloads list + study plans.
@@ -1151,43 +1257,60 @@ const App = () => {
       </main>
 
       {/* FOOTER (site-wide) */}
+      
       <footer className="bg-primary-dark-green text-white py-5 mt-auto">
-        <Container>
-          <Row className="g-4">
-            <Col md={6}>
-              <h4 className="fs-3 fw-bold mb-3">ThriveBridge</h4>
-              <p className="text-white-50">
-                Your trusted partner in building a successful life in Canada. From immigration to homeownership, we're here for your entire journey.
-              </p>
-            </Col>
-            <Col md={3}>
-              <h5 className="fw-semibold mb-3">Quick Links</h5>
-              <Nav className="flex-column">
-                {navigation.map((item) => (
-                  <Nav.Link
-                    key={item.id}
-                    onClick={() => setActiveTab(item.id)}
-                    className="text-white-50 p-0 mb-2 footer-link"
-                  >
-                    {item.name}
-                  </Nav.Link>
-                ))}
-              </Nav>
-            </Col>
-            <Col md={3}>
-              <h5 className="fw-semibold mb-3">Contact Info</h5>
-              <ul className="list-unstyled text-white-50">
-                <li className="mb-2"><i className="bi bi-envelope me-2" aria-hidden="true"></i>semiratesfai11@gmail.com</li>
-                <li className="mb-2"><i className="bi bi-telephone me-2" aria-hidden="true"></i>647-896-8004</li>
-                <li><i className="bi bi-geo-alt me-2" aria-hidden="true"></i>Toronto, ON</li>
-              </ul>
-            </Col>
-          </Row>
-          <div className="border-top border-secondary mt-4 pt-4 text-center text-white-50">
-            <p>&copy; 2024 ThriveBridge. All rights reserved.</p>
-          </div>
-        </Container>
-      </footer>
+      <Container>
+        <Row className="g-4">
+          <Col md={6}>
+            <h4 className="fs-3 fw-bold mb-3">ThriveBridge</h4>
+            <p className="text-white-50">
+              Your trusted partner in building a successful life in Canada. From immigration to homeownership, we're here for your entire journey.
+            </p>
+          </Col>
+
+          {/* ✅ Quick Links with highlight-on-click */}
+          <Col md={3}>
+            <h5 className="fw-semibold mb-3">Quick Links</h5>
+            <Nav className="flex-column">
+              {navigation.map((item) => (
+                <Nav.Link
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id)}
+                  className="p-0 mb-2 footer-link"
+                >
+                  {item.name}
+                </Nav.Link>
+              ))}
+            </Nav>
+          </Col>
+          
+
+          {/* Contact Section */}
+          <Col md={3}>
+            <h5 className="fw-semibold mb-3">Contact Info</h5>
+            <ul className="list-unstyled text-white-50">
+              <li className="mb-2">
+                <i className="bi bi-envelope me-2"></i>semiratesfai11@gmail.com
+              </li>
+              <li className="mb-2">
+                <i className="bi bi-telephone me-2"></i>647-896-8004
+              </li>
+              <li>
+                <i className="bi bi-geo-alt me-2"></i>Toronto, ON
+              </li>
+            </ul>
+          </Col>
+        </Row>
+
+        {/* COPYRIGHT */}
+        <div className="border-top border-secondary mt-4 pt-4 text-center text-white-50">
+          <p>&copy; 2024 ThriveBridge. All rights reserved.</p>
+        </div>
+      </Container>
+</footer>
+
+
+      
     </div>
   );
 };

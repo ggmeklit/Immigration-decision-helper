@@ -107,25 +107,59 @@
 .chat-link + .chat-link {
   margin-top: 8px;
 }
-.chat-link:hover {
-  background: #f6f9f8;
+
+.footer-link {
+  color: #ffffff80 !important;
+  transition: color 0.2s ease;
 }
 
-a {
-  color: blue;
+.footer-link:hover {
+  color: #ffc107 !important;
 }
 
-a:visited {
-  color: purple;
+/* TOP NAVBAR ACTIVE LINK (stays yellow) */
+.navbar-nav .nav-link.active {
+  color: #ffc107 !important;   /* yellow */
+  font-weight: 600;
 }
 
-a:hover {
-  color: darkblue;
+/* Fix spacing + center alignment for THRIVE cards */
+/* THRIVE cards — equal height + perfect alignment */
+.thrive-card {
+  text-align: center;
+  padding: 32px 24px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+  height: 100%;                  /* all cards same height */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
 
-a:active {
-  color: red;
+/* THRIVE icon circle */
+.thrive-icon {
+  width: 72px;
+  height: 72px;
+  background: #FFB300;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--green);
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 auto 18px auto;
 }
 
+/* Title inside THRIVE card */
+.thrive-card h6 {
+  margin-bottom: 12px;
+}
+
+/* Description text spacing fix */
+.thrive-card p {
+  margin-bottom: 0;
+}
 
 
