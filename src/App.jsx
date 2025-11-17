@@ -18,11 +18,7 @@ import {
 import './App.css';
 import emailjs from '@emailjs/browser';
 import { supabase } from "./superbase";
-<img 
-  src="/newcomers_canada_group_toronto.png"
-  alt="Newcomers in Canada"
-/>
-
+import keyMoment from "/public/newcomers_canada_group_toronto.png";
 
 // === EMAILJS CONFIG (Contact form only) ===
 // Replace YOUR_TEMPLATE_ID and YOUR_PUBLIC_KEY with your EmailJS values
