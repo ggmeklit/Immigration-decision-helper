@@ -18,7 +18,8 @@ import {
 import './App.css';
 import emailjs from '@emailjs/browser';
 import { supabase } from "./superbase";
-import keyMoment from "/public/newcomers_canada_group_toronto.png";
+const keyMoment = new URL('/newcomers_canada_group_toronto.png', import.meta.url).href;
+
 
 // === EMAILJS CONFIG (Contact form only) ===
 // Replace YOUR_TEMPLATE_ID and YOUR_PUBLIC_KEY with your EmailJS values
