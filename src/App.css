@@ -162,4 +162,16 @@
   margin-bottom: 0;
 }
 
+.quote-box {
+  background: var(--green);
+  color: #fff;
+  padding: 18px 24px;  /* thinner */
+  border-radius: 10px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.4;
+  max-width: 720px;   /* prevents full width */
+  margin-top: 24px;
+}
+
 

@@ -297,8 +297,35 @@ const App = () => {
 
   // === FORM SUBMIT HANDLERS (YOUR ORIGINAL) ===
   // This handles Immigration form submit and shows a success message
-  const handleImmigrationSubmit = (e) => {
+  // This handles Immigration form submit and shows a success message
+const handleImmigrationSubmit = async (e) => {
   e.preventDefault();
+
+  // === SAVE TO SUPABASE ===
+  const { data, error } = await supabase
+    .from("immigration_forms")
+    .insert([
+      {
+        full_name: immigrationFormData.fullName,
+        email: immigrationFormData.email,
+        age: immigrationFormData.age,
+        education: immigrationFormData.education,
+        work_experience: immigrationFormData.workExperience,
+        language: immigrationFormData.languageProficiency,
+        current_country: immigrationFormData.currentCountry,
+        intended_province: immigrationFormData.intendedProvince,
+        family_in_canada: immigrationFormData.familyInCanada,
+        budget: immigrationFormData.budget,
+      }
+    ]);
+
+  if (error) {
+    console.error(error);
+    alert("Could not save immigration form to database.");
+    return;
+  }
+
+  // === YOUR ORIGINAL LOGIC (unchanged) ===
 
   // 1) Build helper bot results
   const results = buildImmigrationResults(immigrationFormData);
@@ -324,6 +351,7 @@ const App = () => {
     budget: "",
   });
 };
+
 
   // This handles Mortgage form submit and shows a success message
   
@@ -615,10 +643,14 @@ const handleMortgageSubmit = async (e) => {
               <Button variant="main" size="lg">Join Our Community</Button>
             </Col>
             <Col lg={6}>
-              <div className="placeholder-image rounded-3 border border-2 border-dashed p-4">
-                IMG-005: Community Hub
-              </div>
-            </Col>
+            <img
+              src="/community_hub.png"
+              alt="Community hub for newcomers in Canada – workshops, support, and networking"
+              className="img-fluid rounded-3"
+              style={{ width: "100%", height: "400px", objectFit: "cover" }}
+            />
+          </Col>
+
           </Row>
         </Container>
       </section>
@@ -1027,17 +1059,26 @@ const handleMortgageSubmit = async (e) => {
           <p className="text-muted mb-4">
             From the moment you arrive with dreams and aspirations, to the day you receive your keys to your new home and your Canadian citizenship certificate, we're here to guide you every step of the way.
           </p>
-          <Card bg="success" text="white" className="p-3">
-            <Card.Body>
-              <blockquote className="blockquote mb-0">
-                <p>"We don't just help you navigate the system – we help you build your future."</p>
-              </blockquote>
+          <Card bg="success" text="white" className="p-2 mb-3" style={{ maxWidth: "720px" }}>
+            <Card.Body className="p-2">
+              <p className="m-0 fw-semibold">
+                "We don't just help you navigate the system – we help you build your future."
+              </p>
             </Card.Body>
           </Card>
+
+
         </Col>
         <Col lg={6}>
-          <div className="placeholder-image rounded-3 border border-2 border-dashed p-4">IMG-004: The Bridge Metaphor</div>
+          <img
+            src="/About-us.PNG"
+            alt="About our team and mission at ThriveBridge"
+            className="img-fluid rounded-3"
+            style={{ width: "100%", height: "400px", objectFit: "cover" }}
+          />
+
         </Col>
+
       </Row>
 
       {/* THREE FEATURE ICONS (Nationwide / Expert Team / Integrated) */}
