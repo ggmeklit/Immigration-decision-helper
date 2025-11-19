@@ -17,7 +17,7 @@ import {
 // Keep your CSS import
 import './App.css';
 import emailjs from '@emailjs/browser';
-import { supabase } from "./supabase";
+//import { supabase } from "./supabase";
 const keyMoment = "/newcomers_canada_group_toronto.png";
 
 
