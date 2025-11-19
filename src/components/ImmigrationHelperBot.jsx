@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, Row, Col, Form, Button, Badge, Alert } from "react-bootstrap";
+import { Card, Row, Col, Form, Button, Badge, Alert, Modal } from "react-bootstrap";
 
 /**
  * Canada Immigration Program Helper (React)

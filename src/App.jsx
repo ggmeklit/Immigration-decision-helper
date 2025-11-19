@@ -11,15 +11,18 @@ import React, { useState, useEffect } from 'react';
 
 // We use your existing React-Bootstrap components (already in your project)
 import {
-  Navbar, Container, Nav, Button, Row, Col, Card, Form, Alert
+  Navbar, Container, Nav, Button, Row, Col, Card, Form, Alert, Modal
 } from 'react-bootstrap';
 
 // Keep your CSS import
 import './App.css';
 import emailjs from '@emailjs/browser';
+import ImmigrationHelperBot from "./components/ImmigrationHelperBot";
+
+
+
 //import { supabase } from "./supabase";
 const keyMoment = "/newcomers_canada_group_toronto.png";
-
 
 // === EMAILJS CONFIG (Contact form only) ===
 // Replace YOUR_TEMPLATE_ID and YOUR_PUBLIC_KEY with your EmailJS values
@@ -56,6 +59,9 @@ const App = () => {
   // Controls “submitted” success messages after each form submit
   const [immigrationFormSubmitted, setImmigrationFormSubmitted] = useState(false);
   const [mortgageFormSubmitted, setMortgageFormSubmitted] = useState(false);
+
+  const [showImmigrationBot, setShowImmigrationBot] = useState(false);
+  const [immigrationResults, setImmigrationResults] = useState([]);
 
   // === CONTACT FORM STATE (EmailJS - NEW) ===
   const [contactForm, setContactForm] = useState({
@@ -228,60 +234,99 @@ const App = () => {
     setContactForm((prev) => ({ ...prev, [name]: value }));
   };
 
+// Providing immigration options
+  const buildImmigrationResults = (data) => {
+  const results = [];
+
+  // 1) Express Entry / Skilled Worker
+  if (
+    ["bachelor", "master", "phd"].includes(data.education) &&
+    ["2-5", "6-10", "10+"].includes(data.workExperience) &&
+    ["advanced", "fluent"].includes(data.languageProficiency)
+  ) {
+    results.push({
+      id: "express-entry",
+      title: "Express Entry – Skilled Worker Pathway",
+      tagline: "Strong candidate profile for points-based federal programs.",
+      why:
+        "Your combination of higher education, solid work experience, and good language skills aligns well with Express Entry-type programs.",
+      next:
+        "Check your CRS-like score, collect reference letters, and book your language test (IELTS/CELPIP/TEF).",
+    });
+  }
+
+  // 2) Provincial Nominee Program
+  if (data.intendedProvince) {
+    results.push({
+      id: "pnp",
+      title: "Provincial Nominee Program (PNP)",
+      tagline: `Potential fit for ${data.intendedProvince.toUpperCase()}-based programs.`,
+      why:
+        "Choosing a specific province often opens additional PNP pathways aligned with local labour market needs.",
+      next:
+        "Research that province’s PNP streams and look for those matching your occupation and language level.",
+    });
+  }
+
+  // 3) Family / community support
+  if (data.familyInCanada === "yes") {
+    results.push({
+      id: "family",
+      title: "Leverage Family or Community Ties",
+      tagline: "Existing support network in Canada is a strong asset.",
+      why:
+        "Having family in Canada can help with integration, proof of settlement support, and sometimes eligibility in specific programs.",
+      next:
+        "Talk to your relatives about where they live, and review programs tied to that province or region.",
+    });
+  }
+
+  // Fallback if nothing specific matched
+  if (results.length === 0) {
+    results.push({
+      id: "general",
+      title: "Book a Personalized Immigration Strategy Call",
+      tagline: "Your profile needs a tailored review.",
+      why:
+        "Based on the information provided, the best next step is a 1:1 review to map realistic options and timelines.",
+      next:
+        "Prepare your CV, language test history (if any), and questions, then book a short consultation.",
+    });
+  }
+
+  return results;
+};
+
+
   // === FORM SUBMIT HANDLERS (YOUR ORIGINAL) ===
   // This handles Immigration form submit and shows a success message
-  const handleImmigrationSubmit = async (e) => {
-    e.preventDefault();
-    setImmigrationFormSubmitted(false);
+  const handleImmigrationSubmit = (e) => {
+  e.preventDefault();
 
-    try {
-      // Insert into Supabase
-      const { error } = await supabase
-        .from("immigration_forms")
-        .insert([
-          {
-            full_name: immigrationFormData.fullName,
-            email: immigrationFormData.email,
-            age: immigrationFormData.age,
-            education: immigrationFormData.education,
-            work_experience: immigrationFormData.workExperience,
-            language_proficiency: immigrationFormData.languageProficiency,
-            current_country: immigrationFormData.currentCountry,
-            intended_province: immigrationFormData.intendedProvince,
-            family_in_canada: immigrationFormData.familyInCanada,
-            budget: immigrationFormData.budget,
-          }
-        ]);
+  // 1) Build helper bot results
+  const results = buildImmigrationResults(immigrationFormData);
+  setImmigrationResults(results);
 
-      if (error) {
-        console.error("Insert error:", error);
-        alert("❌ Something went wrong saving your form.");
-        return;
-      }
+  // 2) Show the modal
+  setShowImmigrationBot(true);
 
-      // Success
-      setImmigrationFormSubmitted(true);
-      alert("✅ Your assessment report has been saved!");
+  // 3) Show the success message instead of the form
+  setImmigrationFormSubmitted(true);
 
-      setImmigrationFormData({
-        fullName: "",
-        email: "",
-        age: "",
-        education: "",
-        workExperience: "",
-        languageProficiency: "",
-        currentCountry: "",
-        intendedProvince: "",
-        familyInCanada: "",
-        budget: "",
-      });
-
-    } catch (err) {
-      console.error("Error submitting form:", err);
-      alert("⚠️ Something went wrong. Try again later.");
-    }
-  };   // ✅ THIS BRACE WAS MISSING
-
+  // 4) Clear the form fields
+  setImmigrationFormData({
+    fullName: "",
+    email: "",
+    age: "",
+    education: "",
+    workExperience: "",
+    languageProficiency: "",
+    currentCountry: "",
+    intendedProvince: "",
+    familyInCanada: "",
+    budget: "",
+  });
+};
 
   // This handles Mortgage form submit and shows a success message
   
