@@ -303,21 +303,23 @@ const handleImmigrationSubmit = async (e) => {
 
   // === SAVE TO SUPABASE ===
   const { data, error } = await supabase
-    .from("immigration_forms")
-    .insert([
-      {
-        full_name: immigrationFormData.fullName,
-        email: immigrationFormData.email,
-        age: immigrationFormData.age,
-        education: immigrationFormData.education,
-        work_experience: immigrationFormData.workExperience,
-        language: immigrationFormData.languageProficiency,
-        current_country: immigrationFormData.currentCountry,
-        intended_province: immigrationFormData.intendedProvince,
-        family_in_canada: immigrationFormData.familyInCanada,
-        budget: immigrationFormData.budget,
-      }
-    ]);
+  .from("immigration_forms")
+  .insert([
+    {
+      full_name: immigrationFormData.fullName,
+      email: immigrationFormData.email,
+      age: immigrationFormData.age,
+      education: immigrationFormData.education,
+      work_experience: immigrationFormData.workExperience,
+      language: immigrationFormData.languageProficiency,
+      current_country: immigrationFormData.currentCountry,
+      intended_province: immigrationFormData.intendedProvince,
+      family_in_canada: immigrationFormData.familyInCanada,
+      budget: immigrationFormData.budget,
+      submitted_at: new Date().toISOString()
+    }
+  ]);
+
 
   if (error) {
     console.error(error);
