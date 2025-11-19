@@ -18,10 +18,7 @@ import {
 import './App.css';
 import emailjs from '@emailjs/browser';
 import ImmigrationHelperBot from "./components/ImmigrationHelperBot";
-
-
-
-//import { supabase } from "./supabase";
+import { supabase } from "./supabase";
 const keyMoment = "/newcomers_canada_group_toronto.png";
 
 // === EMAILJS CONFIG (Contact form only) ===
