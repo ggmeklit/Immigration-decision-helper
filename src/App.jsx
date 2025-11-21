@@ -306,8 +306,7 @@ const handleImmigrationSubmit = async (e) => {
   const { data, error } = await supabase
     .from("immigration_forms")
     .insert([
-      {
-        id:generateUUID(),
+      { 
         full_name: immigrationFormData.fullName,
         email: immigrationFormData.email,
         age: immigrationFormData.age,
@@ -348,21 +347,13 @@ const handleImmigrationSubmit = async (e) => {
     education: "",
     workExperience: "",
     languageProficiency: "",
-    currentCountry: "",
+    currentCountry: " ",
     intendedProvince: "",
     familyInCanada: "",
     budget: "",
   });
 };
-  // Simple UUID Generator (for React/JS environments)
-const generateUUID = () => {
-  // Standard UUID v4 generation pattern
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-};
-c
+
   // This handles Mortgage form submit and shows a success message
   
 
