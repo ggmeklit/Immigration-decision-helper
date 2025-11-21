@@ -5,7 +5,7 @@
 // 2) Search now shows “We couldn’t find …” if nothing matches (auto-hides).
 // 3) Added floating ChatWidget (site-wide) + anchors for smooth jumps.
 // 4) Email js keys added for submit inquiry (contact us form) - not functional yet
-//superbase
+//superbase fix added
 // ===================================================================================
 
 import React, { useState, useEffect } from 'react';
@@ -347,7 +347,7 @@ const handleImmigrationSubmit = async (e) => {
     education: "",
     workExperience: "",
     languageProficiency: "",
-    currentCountry: " ",
+    currentCountry: "",
     intendedProvince: "",
     familyInCanada: "",
     budget: "",
