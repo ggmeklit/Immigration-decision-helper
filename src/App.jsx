@@ -5,6 +5,7 @@
 // 2) Search now shows “We couldn’t find …” if nothing matches (auto-hides).
 // 3) Added floating ChatWidget (site-wide) + anchors for smooth jumps.
 // 4) Email js keys added for submit inquiry (contact us form) - not functional yet
+//superbase
 // ===================================================================================
 
 import React, { useState, useEffect } from 'react';
@@ -303,23 +304,23 @@ const handleImmigrationSubmit = async (e) => {
 
   // === SAVE TO SUPABASE ===
   const { data, error } = await supabase
-  .from("immigration_forms")
-  .insert([
-    {
-      full_name: immigrationFormData.fullName,
-      email: immigrationFormData.email,
-      age: immigrationFormData.age,
-      education: immigrationFormData.education,
-      work_experience: immigrationFormData.workExperience,
-      language: immigrationFormData.languageProficiency,
-      current_country: immigrationFormData.currentCountry,
-      intended_province: immigrationFormData.intendedProvince,
-      family_in_canada: immigrationFormData.familyInCanada,
-      budget: immigrationFormData.budget,
-      submitted_at: new Date().toISOString()
-    }
-  ]);
-
+    .from("immigration_forms")
+    .insert([
+      {
+        id:generateUUID(),
+        full_name: immigrationFormData.fullName,
+        email: immigrationFormData.email,
+        age: immigrationFormData.age,
+        education: immigrationFormData.education,
+        work_experience: immigrationFormData.workExperience,
+        language: immigrationFormData.languageProficiency,
+        current_country: immigrationFormData.currentCountry,
+        intended_province: immigrationFormData.intendedProvince,
+        family_in_canada: immigrationFormData.familyInCanada,
+        budget: immigrationFormData.budget,
+        submitted_at: new Date().toISOString(),
+      }
+    ]);
 
   if (error) {
     console.error(error);
@@ -353,8 +354,15 @@ const handleImmigrationSubmit = async (e) => {
     budget: "",
   });
 };
-
-
+  // Simple UUID Generator (for React/JS environments)
+const generateUUID = () => {
+  // Standard UUID v4 generation pattern
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+    return v.toString(16);
+  });
+};
+c
   // This handles Mortgage form submit and shows a success message
   
 
