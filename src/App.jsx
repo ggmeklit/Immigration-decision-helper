@@ -19,7 +19,7 @@ import {
 import './App.css';
 import emailjs from '@emailjs/browser';
 import ImmigrationHelperBot from "./components/ImmigrationHelperBot";
-import { supabase } from "./supabase";
+//import { supabase } from "./supabase";
 const keyMoment = "/newcomers_canada_group_toronto.png";
 
 // === EMAILJS CONFIG (Contact form only) ===
@@ -303,6 +303,7 @@ const handleImmigrationSubmit = async (e) => {
   e.preventDefault();
 
   // === SAVE TO SUPABASE ===
+  /*
   const { data, error } = await supabase
     .from("immigration_forms")
     .insert([
@@ -326,20 +327,12 @@ const handleImmigrationSubmit = async (e) => {
     alert("Could not save immigration form to database.");
     return;
   }
-
+*/
   // === YOUR ORIGINAL LOGIC (unchanged) ===
-
-  // 1) Build helper bot results
   const results = buildImmigrationResults(immigrationFormData);
   setImmigrationResults(results);
-
-  // 2) Show the modal
   setShowImmigrationBot(true);
-
-  // 3) Show the success message instead of the form
   setImmigrationFormSubmitted(true);
-
-  // 4) Clear the form fields
   setImmigrationFormData({
     fullName: "",
     email: "",
@@ -781,6 +774,74 @@ const handleMortgageSubmit = async (e) => {
             )}
           </Card.Body>
         </Card>
+                 {/* === Immigration Helper Bot Modal (opens after submit) === */}
+<Modal
+  show={showImmigrationBot}
+  onHide={() => setShowImmigrationBot(false)}
+  centered
+  size="lg"
+>
+  <Modal.Header closeButton>
+    <Modal.Title>Your Immigration Helper Results</Modal.Title>
+  </Modal.Header>
+
+  <Modal.Body>
+    <p className="text-muted mb-3">
+      These are general, non-legal suggestions based on what you just
+      submitted.
+    </p>
+
+    {Array.isArray(immigrationResults) && immigrationResults.length > 0 ? (
+      immigrationResults.map((r) => (
+        <Card key={r.id} className="mb-3 border-0 shadow-sm">
+          <Card.Body>
+            <h5 className="fw-bold text-primary-dark-green mb-1">
+              {r.title}
+            </h5>
+            <div className="text-success fw-semibold mb-2">
+              {r.tagline}
+            </div>
+            <p className="mb-2">{r.why}</p>
+            <p className="mb-0">
+              <strong>Next:</strong> {r.next}
+            </p>
+          </Card.Body>
+        </Card>
+      ))
+    ) : (
+      <Alert variant="light" className="border-0">
+        <p className="mb-0">
+          Fill out the immigration assessment form first. Once you submit it,
+          your personalized suggestions will appear here.
+        </p>
+      </Alert>
+    )}
+
+    <Alert variant="info" className="small mt-3 mb-0">
+      Want tailored advice? Book a quick consultation and we’ll validate
+      eligibility, timelines, and documents.
+    </Alert>
+  </Modal.Body>
+
+  <Modal.Footer className="d-flex justify-content-between">
+    <Button
+      variant="outline-secondary"
+      onClick={() => setShowImmigrationBot(false)}
+    >
+      Close
+    </Button>
+    <Button
+      variant="main"
+      onClick={() => {
+        setShowImmigrationBot(false);
+        goTo("contact", "contact-form");
+      }}
+    >
+      📞 Book an appointment
+    </Button>
+  </Modal.Footer>
+</Modal>
+
       </Container>
     );
   };
