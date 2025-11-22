@@ -19,7 +19,7 @@ import {
 import './App.css';
 import emailjs from '@emailjs/browser';
 import ImmigrationHelperBot from "./components/ImmigrationHelperBot";
-//import { supabase } from "./supabase";
+import { supabase } from "./supabase";
 const keyMoment = "/newcomers_canada_group_toronto.png";
 
 // === EMAILJS CONFIG (Contact form only) ===
@@ -298,12 +298,11 @@ const App = () => {
 
   // === FORM SUBMIT HANDLERS (YOUR ORIGINAL) ===
   // This handles Immigration form submit and shows a success message
-  // This handles Immigration form submit and shows a success message
+
 const handleImmigrationSubmit = async (e) => {
   e.preventDefault();
 
   // === SAVE TO SUPABASE ===
-  /*
   const { data, error } = await supabase
     .from("immigration_forms")
     .insert([
@@ -327,7 +326,8 @@ const handleImmigrationSubmit = async (e) => {
     alert("Could not save immigration form to database.");
     return;
   }
-*/
+
+
   // === YOUR ORIGINAL LOGIC (unchanged) ===
   const results = buildImmigrationResults(immigrationFormData);
   setImmigrationResults(results);
@@ -358,20 +358,20 @@ const handleMortgageSubmit = async (e) => {
 
   // INSERT INTO SUPABASE
   const { data, error } = await supabase
-    .from('mortgage_forms')
+    .from("immigration_forms")
     .insert([
-      {
-        full_name: mortgageFormData.fullName,
-        email: mortgageFormData.email,
-        phone: mortgageFormData.phone,
-        employment_status: mortgageFormData.employmentStatus,
-        income: mortgageFormData.annualIncome,
-        credit_score: mortgageFormData.creditScore,
-        down_payment: mortgageFormData.downPayment,
-        property_type: mortgageFormData.propertyType,
-        location: mortgageFormData.propertyLocation,
-        first_time_buyer: mortgageFormData.firstTimeBuyer,
-        newcomer_status: mortgageFormData.newcomerStatus,
+      { 
+        full_name: immigrationFormData.fullName,
+        email: immigrationFormData.email,
+        age: immigrationFormData.age,
+        education: immigrationFormData.education,
+        work_experience: immigrationFormData.workExperience,
+        language: immigrationFormData.languageProficiency,
+        current_country: immigrationFormData.currentCountry,
+        intended_province: immigrationFormData.intendedProvince,
+        family_in_canada: immigrationFormData.familyInCanada,
+        budget: immigrationFormData.budget,
+        submitted_at: new Date().toISOString(),
       }
     ]);
 
