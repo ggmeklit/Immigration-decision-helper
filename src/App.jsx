@@ -27,7 +27,7 @@ const keyMoment = "/newcomers_canada_group_toronto.png";
 const EMAILJS = {
   serviceId: 'service_7ar5nu7',     // your service ID
   templateId: 'template_nyy9tj3', 
-  imm_templateID: 'template_w73s3yl'  // immigration assessment autoreply
+  imm_templateID: 'template_w73s3yl',  // immigration assessment autoreply
   publicKey: '3njlzxYwwviO68EmZ',     // from EmailJS dashboard → Account → API Keys
 };
 
