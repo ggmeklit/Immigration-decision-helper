@@ -336,14 +336,14 @@ const App = () => {
   const results = buildImmigrationResults(immigrationFormData);
 
   // Format results nicely for the email body
-  const formattedResults = results
-    .map((r, index) => {
-      return `${index + 1}. ${r.title}
+ const formattedResults = results
+  .map((r, index) => {
+    return `${index + 1}. ${r.title}
 ${r.tagline}
 Why: ${r.why}
 Next: ${r.next}`;
-    })
-    .join("\n\n");
+  })
+  .join("\n\n");
 
   // === SEND RESULTS VIA EMAILJS ===
   try {
