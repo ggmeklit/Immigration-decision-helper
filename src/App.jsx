@@ -12,7 +12,7 @@ import React, { useState, useEffect } from 'react';
 
 // We use your existing React-Bootstrap components (already in your project)
 import {
-  Navbar, Container, Nav, Button, Row, Col, Card, Form, Alert, Modal
+  Navbar, Container, Nav, Button, Row, Col, Card, Form, Alert
 } from 'react-bootstrap';
 
 // Keep your CSS import
@@ -57,9 +57,6 @@ const App = () => {
   // Controls “submitted” success messages after each form submit
   const [immigrationFormSubmitted, setImmigrationFormSubmitted] = useState(false);
   const [mortgageFormSubmitted, setMortgageFormSubmitted] = useState(false);
-
-  const [showImmigrationBot, setShowImmigrationBot] = useState(false);
-  const [immigrationResults, setImmigrationResults] = useState([]);
 
   // === CONTACT FORM STATE (EmailJS - NEW) ===
   const [contactForm, setContactForm] = useState({
@@ -299,40 +296,80 @@ const App = () => {
   // === FORM SUBMIT HANDLERS (YOUR ORIGINAL) ===
   // This handles Immigration form submit and shows a success message
 
-const handleImmigrationSubmit = async (e) => {
+  const handleImmigrationSubmit = async (e) => {
   e.preventDefault();
+  console.log("Submitting immigration form...", immigrationFormData);
 
-  // === SAVE TO SUPABASE ===
-  const { data, error } = await supabase
-    .from("immigration_forms")
-    .insert([
-      { 
-        full_name: immigrationFormData.fullName,
-        email: immigrationFormData.email,
-        age: immigrationFormData.age,
-        education: immigrationFormData.education,
-        work_experience: immigrationFormData.workExperience,
-        language: immigrationFormData.languageProficiency,
-        current_country: immigrationFormData.currentCountry,
-        intended_province: immigrationFormData.intendedProvince,
-        family_in_canada: immigrationFormData.familyInCanada,
-        budget: immigrationFormData.budget,
-        submitted_at: new Date().toISOString(),
+  // === TRY TO SAVE TO SUPABASE, BUT DON'T BLOCK UI IF IT FAILS ===
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from("immigration_forms")
+        .insert([
+          { 
+            full_name: immigrationFormData.fullName,
+            email: immigrationFormData.email,
+            age: immigrationFormData.age,
+            education: immigrationFormData.education,
+            work_experience: immigrationFormData.workExperience,
+            language: immigrationFormData.languageProficiency,
+            current_country: immigrationFormData.currentCountry,
+            intended_province: immigrationFormData.intendedProvince,
+            family_in_canada: immigrationFormData.familyInCanada,
+            budget: immigrationFormData.budget,
+            submitted_at: new Date().toISOString(),
+          }
+        ]);
+
+      if (error) {
+        console.error("Supabase insert error:", error);
       }
-    ]);
-
-  if (error) {
-    console.error(error);
-    alert("Could not save immigration form to database.");
-    return;
+    } catch (err) {
+      console.error("Supabase runtime error:", err);
+    }
+  } else {
+    console.warn("Supabase is not configured, skipping DB insert.");
   }
 
-
-  // === YOUR ORIGINAL LOGIC (unchanged) ===
+  // === BUILD IMMIGRATION RESULTS (same logic as before) ===
   const results = buildImmigrationResults(immigrationFormData);
-  setImmigrationResults(results);
-  setShowImmigrationBot(true);
+
+  // Format results nicely for the email body
+  const formattedResults = results
+    .map((r, index) => {
+      return `${index + 1}. ${r.title}
+${r.tagline}
+Why: ${r.why}
+Next: ${r.next}`;
+    })
+    .join("\n\n");
+
+  // === SEND RESULTS VIA EMAILJS ===
+  try {
+    await emailjs.send(
+      EMAILJS.serviceId,
+      EMAILJS.templateId,
+      {
+        // These are the parameters that go into your EmailJS template
+        from_name: immigrationFormData.fullName || "ThriveBridge user",
+        from_email: immigrationFormData.email,
+        message: formattedResults,
+      },
+      EMAILJS.publicKey
+    );
+    console.log("Assessment email sent successfully");
+  } catch (err) {
+    console.error("Error sending assessment email:", err);
+    alert(
+      "We generated your assessment but couldn't send the email automatically. " +
+      "Please contact us so we can resend it manually."
+    );
+  }
+
+  // === UI STATE: show success message + clear form ===
   setImmigrationFormSubmitted(true);
+  setImmigrationResults(results); // keep in state if you ever need it later
+
   setImmigrationFormData({
     fullName: "",
     email: "",
@@ -346,6 +383,7 @@ const handleImmigrationSubmit = async (e) => {
     budget: "",
   });
 };
+
 
   // This handles Mortgage form submit and shows a success message
   
@@ -725,7 +763,9 @@ const handleMortgageSubmit = async (e) => {
               <Alert variant="success" className="text-center">
                 <i className="bi bi-check-circle-fill display-3 text-success mb-3" aria-hidden="true"></i>
                 <Alert.Heading>Assessment Submitted Successfully!</Alert.Heading>
-                <p>Thank you for completing our immigration assessment. Our team will analyze your profile and send your personalized program recommendations to your email shortly.</p>
+                <p>Thank you for completing our immigration assessment. 
+                   We’ve emailed your personalized program recommendations to the address you provided.
+                   Please check your inbox.</p>
               </Alert>
             ) : (
               // IMMIGRATION FORM FIELDS
@@ -774,74 +814,6 @@ const handleMortgageSubmit = async (e) => {
             )}
           </Card.Body>
         </Card>
-                 {/* === Immigration Helper Bot Modal (opens after submit) === */}
-<Modal
-  show={showImmigrationBot}
-  onHide={() => setShowImmigrationBot(false)}
-  centered
-  size="lg"
->
-  <Modal.Header closeButton>
-    <Modal.Title>Your Immigration Helper Results</Modal.Title>
-  </Modal.Header>
-
-  <Modal.Body>
-    <p className="text-muted mb-3">
-      These are general, non-legal suggestions based on what you just
-      submitted.
-    </p>
-
-    {Array.isArray(immigrationResults) && immigrationResults.length > 0 ? (
-      immigrationResults.map((r) => (
-        <Card key={r.id} className="mb-3 border-0 shadow-sm">
-          <Card.Body>
-            <h5 className="fw-bold text-primary-dark-green mb-1">
-              {r.title}
-            </h5>
-            <div className="text-success fw-semibold mb-2">
-              {r.tagline}
-            </div>
-            <p className="mb-2">{r.why}</p>
-            <p className="mb-0">
-              <strong>Next:</strong> {r.next}
-            </p>
-          </Card.Body>
-        </Card>
-      ))
-    ) : (
-      <Alert variant="light" className="border-0">
-        <p className="mb-0">
-          Fill out the immigration assessment form first. Once you submit it,
-          your personalized suggestions will appear here.
-        </p>
-      </Alert>
-    )}
-
-    <Alert variant="info" className="small mt-3 mb-0">
-      Want tailored advice? Book a quick consultation and we’ll validate
-      eligibility, timelines, and documents.
-    </Alert>
-  </Modal.Body>
-
-  <Modal.Footer className="d-flex justify-content-between">
-    <Button
-      variant="outline-secondary"
-      onClick={() => setShowImmigrationBot(false)}
-    >
-      Close
-    </Button>
-    <Button
-      variant="main"
-      onClick={() => {
-        setShowImmigrationBot(false);
-        goTo("contact", "contact-form");
-      }}
-    >
-      📞 Book an appointment
-    </Button>
-  </Modal.Footer>
-</Modal>
-
       </Container>
     );
   };
