@@ -26,7 +26,8 @@ const keyMoment = "/newcomers_canada_group_toronto.png";
 // Replace YOUR_TEMPLATE_ID and YOUR_PUBLIC_KEY with your EmailJS values
 const EMAILJS = {
   serviceId: 'service_7ar5nu7',     // your service ID
-  templateId: 'template_nyy9tj3',   // e.g., 'template_contact'
+  templateId: 'template_nyy9tj3', 
+  imm_templateID: 'template_w73s3yl'  // immigration assessment autoreply
   publicKey: '3njlzxYwwviO68EmZ',     // from EmailJS dashboard → Account → API Keys
 };
 
@@ -348,7 +349,7 @@ Next: ${r.next}`;
   try {
     await emailjs.send(
       EMAILJS.serviceId,
-      EMAILJS.templateId,
+      EMAILJS.imm_templateID,
       {
         // These are the parameters that go into your EmailJS template
         from_name: immigrationFormData.fullName || "ThriveBridge user",
