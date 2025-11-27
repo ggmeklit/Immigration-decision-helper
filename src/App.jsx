@@ -9,10 +9,11 @@
 // ===================================================================================
 
 import React, { useState, useEffect } from 'react';
+import { Modal, Form } from "react-bootstrap";
 
 // We use your existing React-Bootstrap components (already in your project)
 import {
-  Navbar, Container, Nav, Button, Row, Col, Card, Form, Alert
+  Navbar, Container, Nav, Button, Row, Col, Card, Alert
 } from 'react-bootstrap';
 
 // Keep your CSS import
@@ -71,6 +72,13 @@ const App = () => {
   const [contactSent, setContactSent] = useState(false);
   const [contactError, setContactError] = useState('');
 
+  // === RESOURCE DOWNLOAD MODAL STATE ===
+  const [showResourceModal, setShowResourceModal] = useState(false);
+  const [selectedResource, setSelectedResource] = useState(null);
+  const [resourceUser, setResourceUser] = useState({
+    fullName: "",
+    email: ""
+  });
 
 
   // === CONTENT DATA (YOUR ORIGINAL) ===
@@ -145,10 +153,10 @@ const App = () => {
       icon: 'bi-book',
       details: {
         resources: [
-          { title: 'Canadian School System Guide', type: 'PDF Guide', description: 'Comprehensive overview of K-12 education in Canada' },
+          { title: 'Canadian School System Guide', type: 'PDF Guide', description: 'Comprehensive overview of K-12 education in Canada', fileUrl: 'https://drive.google.com/uc?export=download&id=1vgd_LVDInuD90WVOCpb5LcRXVoiM-Z-E'},
           { title: 'Parent-Child Activity Kit', type: 'Downloadable', description: 'Fun activities to support language learning and bonding' },
-          { title: 'University Application Workbook', type: 'Interactive PDF', description: 'Step-by-step guide for post-secondary applications' },
-          { title: 'Cultural Integration Tips', type: 'Video Series', description: 'Practical advice for navigating Canadian culture' }
+          { title: 'University Application Workbook', type: 'Interactive PDF', description: 'Step-by-step guide for post-secondary applications',fileUrl:'https://drive.google.com/uc?export=download&id=197-x8heOsgf3ic0ibawpL_sDysOh-Bag' },
+          { title: 'Cultural Integration Tips', type: 'Podcast', description: 'Practical advice for navigating Canadian culture', fileUrl: 'https://drive.google.com/drive/folders/1wxigscwbzew8d1rJQeitCIuH8_iTDl-l?usp=drive_link' }
         ],
         studyPlans: [
           { title: 'English Language Learning', duration: '12 weeks', level: 'Beginner to Intermediate' },
@@ -1009,6 +1017,28 @@ const handleMortgageSubmit = async (e) => {
 };
 
   // === RESOURCES PAGE ===
+  const sendResourceEmail = async (resource) => {
+    try {
+      await emailjs.send(
+        EMAILJS.serviceId,  
+        "template_hyzftjm"
+,  
+        {
+          to_email: resourceUser.email,
+          resource_title: resource.title,
+          file_url: resource.fileUrl,
+          full_name: resourceUser.fullName,
+        },
+        EMAILJS.publicKey
+      );
+
+      alert("The file has been emailed to you!");
+    } catch (error) {
+      console.error("Error sending resource email:", error);
+      alert("Could not send the file. Please try again.");
+    }
+  };
+
   // This adds the Resources page: downloads list + study plans.
   const renderResources = () => {
     const service = services.find(s => s.id === 'resources');
@@ -1038,9 +1068,18 @@ const handleMortgageSubmit = async (e) => {
                       </div>
                     </div>
                     <p className="text-muted">{resource.description}</p>
-                    <Button variant="outline-main" className="mt-auto">
-                      Download Now <i className="bi bi-download ms-1" aria-hidden="true"></i>
+                    <Button
+                      variant="outline-main"
+                      className="mt-auto"
+                      onClick={() => {
+                      setSelectedResource(resource);
+                      setShowResourceModal(true);
+                    }}
+
+                    >
+                      Download Now <i className="bi bi-download ms-1"></i>
                     </Button>
+
                   </Card.Body>
                 </Card>
               </Col>
@@ -1373,6 +1412,78 @@ const handleMortgageSubmit = async (e) => {
       <main className="flex-grow-1">
         {renderContent()}
       </main>
+
+      {/* RESOURCE DOWNLOAD MODAL */}
+    <Modal show={showResourceModal} onHide={() => setShowResourceModal(false)}>
+      <Modal.Header closeButton>
+        <Modal.Title>Receive Your File</Modal.Title>
+      </Modal.Header>
+
+      <Modal.Body>
+        <Form>
+          <Form.Group className="mb-3">
+            <Form.Label>Full Name</Form.Label>
+            <Form.Control
+              type="text"
+              value={resourceUser.fullName}
+              onChange={(e) =>
+                setResourceUser({ ...resourceUser, fullName: e.target.value })
+              }
+              placeholder="Enter your full name"
+              required
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Email Address</Form.Label>
+            <Form.Control
+              type="email"
+              value={resourceUser.email}
+              onChange={(e) =>
+                setResourceUser({ ...resourceUser, email: e.target.value })
+              }
+              placeholder="Enter your email"
+              required
+            />
+          </Form.Group>
+        </Form>
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button variant="secondary" onClick={() => setShowResourceModal(false)}>
+          Cancel
+        </Button>
+
+        <Button
+          variant="main"
+          onClick={async () => {
+            try {
+              await emailjs.send(
+                EMAILJS.serviceId,
+                "template_hyzftjm",
+                {
+                  to_email: resourceUser.email,
+                  full_name: resourceUser.fullName,
+                  resource_title: selectedResource.title,
+                  file_url: selectedResource.fileUrl
+                },
+                EMAILJS.publicKey
+              );
+
+              alert("The file has been emailed to you!");
+              setShowResourceModal(false);
+              setResourceUser({ fullName: "", email: "" });
+            } catch (err) {
+              console.error(err);
+              alert("Could not send the file. Please try again.");
+            }
+          }}
+        >
+          Send File
+        </Button>
+      </Modal.Footer>
+    </Modal>
+
 
       {/* FOOTER (site-wide) */}
       
