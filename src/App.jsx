@@ -462,10 +462,11 @@ const handleMortgageSubmit = async (e) => {
       await emailjs.send(
         EMAILJS.serviceId,
         EMAILJS.templateId,
-        {
+        { 
+          is_contact: true,
+          is_resource: false,
           from_name: contactForm.name,
           from_email: contactForm.email,
-          phone: contactForm.phone,
           service_of_interest: contactForm.service,
           message: contactForm.message,
         },
@@ -1021,13 +1022,15 @@ const handleMortgageSubmit = async (e) => {
     try {
       await emailjs.send(
         EMAILJS.serviceId,  
-        "template_hyzftjm"
-,  
+        EMAILJS.templateId,  
         {
-          to_email: resourceUser.email,
+          is_resource: true,
+          is_contact: false,
+          from_email: resourceUser.email,
           resource_title: resource.title,
           file_url: resource.fileUrl,
           full_name: resourceUser.fullName,
+          
         },
         EMAILJS.publicKey
       );
@@ -1460,9 +1463,9 @@ const handleMortgageSubmit = async (e) => {
             try {
               await emailjs.send(
                 EMAILJS.serviceId,
-                "template_hyzftjm",
-                {
-                  to_email: resourceUser.email,
+                EMAILJS.templateId,
+                { is_resource: true,
+                  from_email: resourceUser.email,
                   full_name: resourceUser.fullName,
                   resource_title: selectedResource.title,
                   file_url: selectedResource.fileUrl
