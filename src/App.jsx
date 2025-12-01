@@ -319,6 +319,18 @@ const [phoneError, setPhoneError] = useState("");
   e.preventDefault();
   console.log("Submitting immigration form...", immigrationFormData);
 
+  const results = buildImmigrationResults(immigrationFormData);
+
+    // Format results nicely for the email body
+ const formattedResults = results
+  .map((r, index) => {
+    return `${index + 1}. ${r.title}
+${r.tagline}
+Why: ${r.why}
+Next: ${r.next}`;
+  })
+  .join("\n\n");
+
   // === TRY TO SAVE TO SUPABASE, BUT DON'T BLOCK UI IF IT FAILS ===
   if (supabase) {
     try {
@@ -337,7 +349,8 @@ const [phoneError, setPhoneError] = useState("");
             intended_province: immigrationFormData.intendedProvince,
             family_in_canada: immigrationFormData.familyInCanada,
             budget: immigrationFormData.budget,
-            citizenship: immigrationFormData.citizenship, 
+            citizenship: immigrationFormData.citizenship,
+            assessment_result: formattedResults, 
             submitted_at: new Date().toISOString(),
             
           }
@@ -353,18 +366,7 @@ const [phoneError, setPhoneError] = useState("");
     console.warn("Supabase is not configured, skipping DB insert.");
   }
 
-  // === BUILD IMMIGRATION RESULTS (same logic as before) ===
-  const results = buildImmigrationResults(immigrationFormData);
 
-  // Format results nicely for the email body
- const formattedResults = results
-  .map((r, index) => {
-    return `${index + 1}. ${r.title}
-${r.tagline}
-Why: ${r.why}
-Next: ${r.next}`;
-  })
-  .join("\n\n");
 
   // === SEND RESULTS VIA EMAILJS ===
   try {
@@ -403,6 +405,9 @@ Next: ${r.next}`;
     intendedProvince: "",
     familyInCanada: "",
     budget: "",
+    assessment_result: "",
+    phone: "",
+    citizenship:"",
   });
 };
 
@@ -433,6 +438,9 @@ const handleMortgageSubmit = async (e) => {
         budget: immigrationFormData.budget,
         citizenship: immigrationFormData.citizenship,
         submitted_at: new Date().toISOString(),
+       
+        
+
       }
     ]);
 
