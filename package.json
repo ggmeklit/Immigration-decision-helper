@@ -24,7 +24,10 @@
     "openai": "^6.8.1",
     "react": "^19.1.1",
     "react-bootstrap": "^2.10.10",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-phone-number-input": "^3.4.14",
+    "react-select": "^5.10.2",
+    "react-select-country-list": "^2.2.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",

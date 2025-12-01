@@ -174,4 +174,37 @@
   margin-top: 24px;
 }
 
+/* Make react-phone-number-input match Bootstrap inputs */
+.PhoneInputInput {
+  background-color: #f8f9fa;  /* light grey like Bootstrap */
+  border: 1px solid #ced4da; /* Bootstrap border */
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 1rem;
+  width: 100%;
+  height: calc(2.4rem + 2px)
+}
+
+.PhoneInputInput:focus {
+  outline: none;
+  border-color: #80bdff;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+/* Fix wrapper height for react-phone-number-input to match Bootstrap */
+.PhoneInput {
+  display: flex;
+  align-items: center;
+  height: calc(2.4rem + 2px); /* same height as Bootstrap */
+}
+
+.PhoneInputCountry {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding-left: 6px;
+  padding-right: 4px;
+  border-right: 1px solid #ced4da;
+  background-color: #f8f9fa;
+  border-radius: 4px 0 0 4px;
+}
 
