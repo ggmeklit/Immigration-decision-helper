@@ -833,7 +833,8 @@ const renderImmigration = () => {
                     required
                   >
                     <option value="">Select your country</option>
-                    {countryOptions.map((c) => (
+                    <option value="Canada">Canada</option>
+                    {countryOptions .filter((c) => c.label !== "Canada").map((c) => (
                       <option key={c.value} value={c.label}>
                         {c.label}
                       </option>
