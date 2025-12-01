@@ -10,6 +10,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Modal, Form } from "react-bootstrap";
+import Select from "react-select";
+import countryList from "react-select-country-list";
+import PhoneInput from "react-phone-number-input";
+import "react-phone-number-input/style.css";
+
 
 // We use your existing React-Bootstrap components (already in your project)
 import {
@@ -44,12 +49,16 @@ const App = () => {
   const [searchNotFound, setSearchNotFound] = useState('');
 
   // === FORMS STATE (YOUR ORIGINAL) ===
+  const [immigrationResults, setImmigrationResults] = useState([]);
+
   // Stores values for the Immigration form
   const [immigrationFormData, setImmigrationFormData] = useState({
-    fullName: '', email: '', age: '', education: '', workExperience: '',
+    fullName: '', email: '', age: '', education: '', workExperience: '',phone:'',
     languageProficiency: '', currentCountry: '', intendedProvince: '',
-    familyInCanada: '', budget: ''
+    familyInCanada: '', budget: '', citizenship:''
   });
+  const countryOptions = countryList().getData();
+
   // Stores values for the Mortgage form
   const [mortgageFormData, setMortgageFormData] = useState({
     fullName: '', email: '', phone: '', employmentStatus: '', annualIncome: '',
@@ -79,6 +88,7 @@ const App = () => {
     fullName: "",
     email: ""
   });
+const [phoneError, setPhoneError] = useState("");
 
 
   // === CONTENT DATA (YOUR ORIGINAL) ===
@@ -318,6 +328,7 @@ const App = () => {
           { 
             full_name: immigrationFormData.fullName,
             email: immigrationFormData.email,
+            phone: immigrationFormData.phone,
             age: immigrationFormData.age,
             education: immigrationFormData.education,
             work_experience: immigrationFormData.workExperience,
@@ -326,7 +337,9 @@ const App = () => {
             intended_province: immigrationFormData.intendedProvince,
             family_in_canada: immigrationFormData.familyInCanada,
             budget: immigrationFormData.budget,
+            citizenship: immigrationFormData.citizenship, 
             submitted_at: new Date().toISOString(),
+            
           }
         ]);
 
@@ -418,6 +431,7 @@ const handleMortgageSubmit = async (e) => {
         intended_province: immigrationFormData.intendedProvince,
         family_in_canada: immigrationFormData.familyInCanada,
         budget: immigrationFormData.budget,
+        citizenship: immigrationFormData.citizenship,
         submitted_at: new Date().toISOString(),
       }
     ]);
@@ -699,134 +713,376 @@ const handleMortgageSubmit = async (e) => {
     </>
   );
 
-  // === IMMIGRATION PAGE ===
-  // This adds the Immigration service page: steps, testimonials, and the immigration form.
-  const renderImmigration = () => {
-    const service = services.find(s => s.id === 'immigration');
-    return (
-      <Container className="py-5">
-        {/* TOP TITLE + DESCRIPTION */}
-        <div className="text-center mb-5">
-          <h1 className="display-4 fw-bold text-primary-dark-green mb-3">{service.title}</h1>
-          <p className="fs-5 text-muted">{service.description}</p>
-        </div>
+// === IMMIGRATION PAGE ===
+const renderImmigration = () => {
+  const service = services.find(s => s.id === 'immigration');
 
-        {/* PROCESS STEPS (4 cards) */}
-        <div className="mb-5">
-          <h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">Our Immigration Process</h2>
-          <Row xs={1} md={2} lg={4} className="g-4">
-            {service.details.process.map((step) => (
-              <Col key={step.step}>
-                <Card className="text-center h-100 shadow-sm border-light p-3">
-                  <Card.Body>
-                    <div className="d-flex align-items-center justify-content-center bg-accent-yellow rounded-circle mx-auto mb-3" style={{ width: '48px', height: '48px' }}>
-                      <span className="text-primary-dark-green fw-bold fs-5">{step.step}</span>
-                    </div>
-                    <h5 className="fw-bold text-primary-dark-green mb-2">{step.title}</h5>
-                    <p className="text-muted small">{step.description}</p>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </div>
+  return (
+    <Container className="py-5">
 
-        {/* TESTIMONIALS (2 cards) */}
-        <div className="bg-light rounded-3 p-4 p-md-5 mb-5">
-          <h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">Success Stories</h2>
-          <Row xs={1} md={2} className="g-4">
-            {service.details.testimonials.map((testimonial, index) => (
-              <Col key={index}>
-                <Card className="shadow-sm border-0 h-100">
-                  <Card.Body className="p-4">
-                    <div className="d-flex align-items-center mb-3">
-                      <div className="icon-box-fix bg-primary-dark-green text-white fs-4 me-3">
-                        <i className="bi bi-person" aria-hidden="true"></i>
-                      </div>
-                      <div>
-                        <h6 className="fw-bold text-primary-dark-green mb-0">{testimonial.name}</h6>
-                        <div className="text-warning">
-                          {[...Array(5)].map((_, i) => (<i key={i} className="bi bi-star-fill small" aria-hidden="true"></i>))}
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-muted fst-italic">"{testimonial.text}"</p>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </div>
+      {/* TOP TITLE + DESCRIPTION */}
+      <div className="text-center mb-5">
+        <h1 className="display-4 fw-bold text-primary-dark-green mb-3">
+          {service.title}
+        </h1>
+        <p className="fs-5 text-muted">
+          {service.description}
+        </p>
+      </div>
 
-        {/* IMMIGRATION FORM (the actual form users fill out) */}
-        <Card className="shadow-lg border-0 p-4 p-md-5" id="immigration-form">
-          <Card.Body>
-            <div className="text-center mb-5">
-              <h2 className="display-6 fw-bold text-primary-dark-green mb-3">Find Your Perfect Canadian Immigration Program</h2>
-              <p className="text-muted mx-auto" style={{ maxWidth: '48rem' }}>
-                Take our free assessment to discover which Canadian immigration program best matches your profile. You'll receive a personalized analysis with program recommendations directly to your email.
+      {/* === IMMIGRATION FORM — NOW MOVED TO THE TOP === */}
+{/* === IMMIGRATION FORM — NOW MOVED TO THE TOP === */}
+      <Card className="shadow-lg border-0 p-4 p-md-5 mb-5" id="immigration-form">
+        <Card.Body>
+          <div className="text-center mb-5">
+            <h2 className="display-6 fw-bold text-primary-dark-green mb-3">
+              Find Your Perfect Canadian Immigration Program
+            </h2>
+            <p className="text-muted mx-auto" style={{ maxWidth: '48rem' }}>
+              Take our free assessment to discover which Canadian immigration program best matches your profile.
+              You'll receive a personalized analysis with program recommendations directly to your email.
+            </p>
+          </div>
+
+          {immigrationFormSubmitted ? (
+            <Alert variant="success" className="text-center">
+              <i className="bi bi-check-circle-fill display-3 text-success mb-3"></i>
+              <Alert.Heading>Assessment Submitted Successfully!</Alert.Heading>
+              <p>
+                Thank you for completing our immigration assessment.
+                We’ve emailed your personalized program recommendations to the address you provided.
               </p>
-            </div>
+            </Alert>
+          ) : (
+            <Form onSubmit={handleImmigrationSubmit}>
 
-            {immigrationFormSubmitted ? (
-              // SUCCESS MESSAGE (shows after the form is submitted)
-              <Alert variant="success" className="text-center">
-                <i className="bi bi-check-circle-fill display-3 text-success mb-3" aria-hidden="true"></i>
-                <Alert.Heading>Assessment Submitted Successfully!</Alert.Heading>
-                <p>Thank you for completing our immigration assessment. 
-                   We’ve emailed your personalized program recommendations to the address you provided.
-                   Please check your inbox.</p>
+              {/* FULL NAME + EMAIL */}
+              <Row className="g-3 mb-3">
+                <Form.Group as={Col} md={6}>
+                  <Form.Label>Full Name *</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="fullName"
+                    value={immigrationFormData.fullName}
+                    onChange={handleImmigrationInputChange}
+                    required
+                    placeholder="Enter your full name"
+                  />
+                </Form.Group>
+
+                <Form.Group as={Col} md={6}>
+                  <Form.Label>Email Address *</Form.Label>
+                  <Form.Control
+                    type="email"
+                    name="email"
+                    value={immigrationFormData.email}
+                    onChange={handleImmigrationInputChange}
+                    required
+                    placeholder="Enter your email"
+                  />
+                </Form.Group>
+              </Row>
+
+              {/* ✅ PHONE NUMBER (correct placement) */}
+              {/* PHONE NUMBER */}
+              <Row className="g-3 mb-3">
+                <Form.Group as={Col} md={6}>
+                  <Form.Label>Phone Number *</Form.Label>
+
+                  <PhoneInput
+                    international
+                    defaultCountry="CA"
+                    value={immigrationFormData.phone} 
+                    onChange={(value) => {
+                      setImmigrationFormData(prev => ({ ...prev, phone: value }));
+
+                      // VALIDATION (simple, no regex)
+                      if (!value) {
+                        setPhoneError("Please enter your phone number.");
+                      } else if (value.length < 10) {
+                        setPhoneError("Please check your phone number. It seems too short for this country.");
+                      } else {
+                        setPhoneError("");
+                      }
+                    }}
+                    className="PhoneInput form-control"
+                  />
+
+                  {phoneError && (
+                    <div style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
+                      {phoneError}
+                    </div>
+                  )}
+                </Form.Group>
+
+              {/* 🌍 COUNTRY SELECT (correct placement + fixed Row) */}
+                <Form.Group as={Col} md={6}>
+                  <Form.Label>Current Country of Residence *</Form.Label>
+                  <Form.Select
+                    name="currentCountry"
+                    value={immigrationFormData.currentCountry}
+                    onChange={handleImmigrationInputChange}
+                    required
+                  >
+                    <option value="">Select your country</option>
+                    {countryOptions.map((c) => (
+                      <option key={c.value} value={c.label}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </Form.Select>
+                </Form.Group>
+              </Row>
+
+
+
+              {/* AGE + EDUCATION */}
+              <Row className="g-3 mb-3">
+                <Form.Group as={Col} md={6}>
+                  <Form.Label>Age *</Form.Label>
+                  <Form.Select
+                    name="age"
+                    value={immigrationFormData.age}
+                    onChange={handleImmigrationInputChange}
+                    required
+                  >
+                    <option value="">Select your age range</option>
+                    <option value="18-24">18-24 years</option>
+                    <option value="25-35">25-35 years</option>
+                    <option value="36-45">36-45 years</option>
+                    <option value="46-55">46-55 years</option>
+                    <option value="55+">55+ years</option>
+                  </Form.Select>
+                </Form.Group>
+
+                <Form.Group as={Col} md={6}>
+                  <Form.Label>Highest Education Level *</Form.Label>
+                  <Form.Select
+                    name="education"
+                    value={immigrationFormData.education}
+                    onChange={handleImmigrationInputChange}
+                    required
+                  >
+                    <option value="">Select your education level</option>
+                    <option value="high-school">High School</option>
+                    <option value="bachelor">Bachelor's Degree</option>
+                    <option value="master">Master's Degree</option>
+                    <option value="phd">PhD/Doctorate</option>
+                    <option value="diploma">Diploma/Certificate</option>
+                  </Form.Select>
+                </Form.Group>
+              </Row>
+
+              {/* WORK EXP + LANGUAGE */}
+              <Row className="g-3 mb-3">
+                <Form.Group as={Col} md={6}>
+                  <Form.Label>Work Experience *</Form.Label>
+                  <Form.Select
+                    name="workExperience"
+                    value={immigrationFormData.workExperience}
+                    onChange={handleImmigrationInputChange}
+                    required
+                  >
+                    <option value="">Select your experience level</option>
+                    <option value="0-1">0-1 years</option>
+                    <option value="2-5">2-5 years</option>
+                    <option value="6-10">6-10 years</option>
+                    <option value="10+">10+ years</option>
+                  </Form.Select>
+                </Form.Group>
+
+                <Form.Group as={Col} md={6}>
+                  <Form.Label>Language Proficiency *</Form.Label>
+                  <Form.Select
+                    name="languageProficiency"
+                    value={immigrationFormData.languageProficiency}
+                    onChange={handleImmigrationInputChange}
+                    required
+                  >
+                    <option value="">Select your proficiency level</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                    <option value="fluent">Fluent/Native</option>
+                  </Form.Select>
+                </Form.Group>
+              </Row>
+
+              {/* Citizenship + PROVINCE */}
+              {/* 🌍 CITIZENSHIP SELECT */}
+            <Row className="g-3 mb-3">
+              <Form.Group as={Col} md={6}>
+                <Form.Label>Country of citizenship *</Form.Label>
+                <Form.Select
+                  name="citizenship"
+                  value={immigrationFormData.citizenship}
+                  onChange={handleImmigrationInputChange}
+                  required
+                >
+                  <option value="">Select your citizenship</option>
+
+                  {countryOptions
+                    .filter((c) => c.label !== "Canada")  // ← removes Canada from the list
+                    .map((c) => (
+                      <option key={c.value} value={c.label}>
+                        {c.label}
+                      </option>
+                    ))}
+                </Form.Select>
+              </Form.Group>
+
+
+                <Form.Group as={Col} md={6}>
+                  <Form.Label>Intended Province *</Form.Label>
+                  <Form.Select
+                    name="intendedProvince"
+                    value={immigrationFormData.intendedProvince}
+                    onChange={handleImmigrationInputChange}
+                    required
+                  >
+                    <option value="">Select your preferred province</option>
+                    <option value="ontario">Ontario</option>
+                    <option value="bc">British Columbia</option>
+                    <option value="quebec">Quebec</option>
+                    <option value="alberta">Alberta</option>
+                    <option value="manitoba">Manitoba</option>
+                    <option value="saskatchewan">Saskatchewan</option>
+                    <option value="nova-scotia">Nova Scotia</option>
+                    <option value="new-brunswick">New Brunswick</option>
+                    <option value="pei">Prince Edward Island</option>
+                    <option value="newfoundland">
+                      Newfoundland and Labrador
+                    </option>
+                  </Form.Select>
+                </Form.Group>
+              </Row>
+
+              {/* FAMILY + BUDGET */}
+              <Row className="g-3 mb-4">
+                <Form.Group as={Col} md={6}>
+                  <Form.Label>Family in Canada? *</Form.Label>
+                  <Form.Select
+                    name="familyInCanada"
+                    value={immigrationFormData.familyInCanada}
+                    onChange={handleImmigrationInputChange}
+                    required
+                  >
+                    <option value="">Select an option</option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </Form.Select>
+                </Form.Group>
+
+                <Form.Group as={Col} md={6}>
+                  <Form.Label>Budget (CAD) *</Form.Label>
+                  <Form.Select
+                    name="budget"
+                    value={immigrationFormData.budget}
+                    onChange={handleImmigrationInputChange}
+                    required
+                  >
+                    <option value="">Select your budget range</option>
+                    <option value="5000-10000">$5,000 - $10,000</option>
+                    <option value="10000-20000">$10,000 - $20,000</option>
+                    <option value="20000-30000">$20,000 - $30,000</option>
+                    <option value="30000+">$30,000+</option>
+                  </Form.Select>
+                </Form.Group>
+              </Row>
+
+              <Alert variant="info" className="small">
+                <strong>Note:</strong> This assessment is free and confidential and will be emailed to you. This assessment does not represent final decision or guaranteed determination of eligibility
               </Alert>
-            ) : (
-              // IMMIGRATION FORM FIELDS
-              <Form onSubmit={handleImmigrationSubmit}>
-                <Row className="g-3 mb-3">
-                  <Form.Group as={Col} md={6}>
-                    <Form.Label>Full Name *</Form.Label>
-                    <Form.Control type="text" name="fullName" value={immigrationFormData.fullName} onChange={handleImmigrationInputChange} required placeholder="Enter your full name" />
-                  </Form.Group>
-                  <Form.Group as={Col} md={6}>
-                    <Form.Label>Email Address *</Form.Label>
-                    <Form.Control type="email" name="email" value={immigrationFormData.email} onChange={handleImmigrationInputChange} required placeholder="Enter your email" />
-                  </Form.Group>
-                </Row>
 
-                <Row className="g-3 mb-3">
-                  <Form.Group as={Col} md={6}><Form.Label>Age *</Form.Label><Form.Select name="age" value={immigrationFormData.age} onChange={handleImmigrationInputChange} required><option value="">Select your age range</option><option value="18-24">18-24 years</option><option value="25-35">25-35 years</option><option value="36-45">36-45 years</option><option value="46-55">46-55 years</option><option value="55+">55+ years</option></Form.Select></Form.Group>
-                  <Form.Group as={Col} md={6}><Form.Label>Highest Education Level *</Form.Label><Form.Select name="education" value={immigrationFormData.education} onChange={handleImmigrationInputChange} required><option value="">Select your education level</option><option value="high-school">High School</option><option value="bachelor">Bachelor's Degree</option><option value="master">Master's Degree</option><option value="phd">PhD/Doctorate</option><option value="diploma">Diploma/Certificate</option></Form.Select></Form.Group>
-                </Row>
+              <div className="d-grid mt-4">
+                <Button variant="main" type="submit" size="lg">
+                  <i className="bi bi-send me-2"></i>
+                  Get My Free Immigration Assessment
+                </Button>
+              </div>
+            </Form>
+          )}
+        </Card.Body>
+      </Card>
 
-                <Row className="g-3 mb-3">
-                  <Form.Group as={Col} md={6}><Form.Label>Work Experience *</Form.Label><Form.Select name="workExperience" value={immigrationFormData.workExperience} onChange={handleImmigrationInputChange} required><option value="">Select your experience level</option><option value="0-1">0-1 years</option><option value="2-5">2-5 years</option><option value="6-10">6-10 years</option><option value="10+">10+ years</option></Form.Select></Form.Group>
-                  <Form.Group as={Col} md={6}><Form.Label>Language Proficiency (English/French) *</Form.Label><Form.Select name="languageProficiency" value={immigrationFormData.languageProficiency} onChange={handleImmigrationInputChange} required><option value="">Select your proficiency level</option><option value="beginner">Beginner</option><option value="intermediate">Intermediate</option><option value="advanced">Advanced</option><option value="fluent">Fluent/Native</option></Form.Select></Form.Group>
-                </Row>
+    {/* === IMMIGRATION PROCESS (original layout restored) === */}
+      <div className="bg-white rounded-3 p-4 p-md-5 mb-5 shadow-sm">
+        <h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">
+          Our Immigration Process
+        </h2>
 
-                <Row className="g-3 mb-3">
-                  <Form.Group as={Col} md={6}><Form.Label>Current Country of Residence *</Form.Label><Form.Control type="text" name="currentCountry" value={immigrationFormData.currentCountry} onChange={handleImmigrationInputChange} required placeholder="Enter your current country" /></Form.Group>
-                  <Form.Group as={Col} md={6}><Form.Label>Intended Province in Canada *</Form.Label><Form.Select name="intendedProvince" value={immigrationFormData.intendedProvince} onChange={handleImmigrationInputChange} required><option value="">Select your preferred province</option><option value="ontario">Ontario</option><option value="bc">British Columbia</option><option value="quebec">Quebec</option><option value="alberta">Alberta</option><option value="manitoba">Manitoba</option><option value="saskatchewan">Saskatchewan</option><option value="nova-scotia">Nova Scotia</option><option value="new-brunswick">New Brunswick</option><option value="pei">Prince Edward Island</option><option value="newfoundland">Newfoundland and Labrador</option></Form.Select></Form.Group>
-                </Row>
+        <Row xs={1} md={2} lg={4} className="g-4 text-center">
+          {service.details.process.map((step) => (
+            <Col key={step.step}>
+              <Card className="h-100 shadow-sm border-light p-4">
+                <Card.Body>
+                  <div
+                    className="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center"
+                    style={{
+                      width: "48px",
+                      height: "48px",
+                      backgroundColor: "#0f4d3a",
+                      color: "white",
+                      fontWeight: "bold",
+                      fontSize: "1.25rem",
+                    }}
+                  >
+                    {step.step}
+                  </div>
 
-                <Row className="g-3 mb-4">
-                  <Form.Group as={Col} md={6}><Form.Label>Do you have family members in Canada? *</Form.Label><Form.Select name="familyInCanada" value={immigrationFormData.familyInCanada} onChange={handleImmigrationInputChange} required><option value="">Select an option</option><option value="yes">Yes</option><option value="no">No</option></Form.Select></Form.Group>
-                  <Form.Group as={Col} md={6}><Form.Label>Approximate Budget (CAD) *</Form.Label><Form.Select name="budget" value={immigrationFormData.budget} onChange={handleImmigrationInputChange} required><option value="">Select your budget range</option><option value="5000-10000">$5,000 - $10,000</option><option value="10000-20000">$10,000 - $20,000</option><option value="20000-30000">$20,000 - $30,000</option><option value="30000+">$30,000+</option></Form.Select></Form.Group>
-                </Row>
+                  <h5 className="fw-bold text-primary-dark-green mb-2">
+                    {step.title}
+                  </h5>
 
-                <Alert variant="info" className="small">
-                  <strong>Note:</strong> This assessment is free and confidential. Your information will only be used to provide personalized recommendations.
-                </Alert>
+                  <p className="text-muted small mb-0">{step.description}</p>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </div>
 
-                <div className="d-grid mt-4">
-                  <Button variant="main" type="submit" size="lg">
-                    <i className="bi bi-send me-2" aria-hidden="true"></i>Get My Free Immigration Assessment
-                  </Button>
-                </div>
-              </Form>
-            )}
-          </Card.Body>
-        </Card>
-      </Container>
-    );
-  };
+
+
+      {/* === TESTIMONIALS === */}
+      <div className="bg-light rounded-3 p-4 p-md-5 mb-5">
+        <h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">
+          Success Stories
+        </h2>
+        <Row xs={1} md={2} className="g-4">
+          {service.details.testimonials.map((testimonial, index) => (
+            <Col key={index}>
+              <Card className="shadow-sm border-0 h-100">
+                <Card.Body className="p-4">
+                  <div className="d-flex align-items-center mb-3">
+                    <div className="icon-box-fix bg-primary-dark-green text-white fs-4 me-3">
+                      <i className="bi bi-person"></i>
+                    </div>
+                    <div>
+                      <h6 className="fw-bold text-primary-dark-green mb-0">
+                        {testimonial.name}
+                      </h6>
+                      <div className="text-warning">
+                        {[...Array(5)].map((_, i) => (
+                          <i key={i} className="bi bi-star-fill small"></i>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-muted fst-italic">
+                    "{testimonial.text}"
+                  </p>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </div>
+
+    </Container>
+  );
+};
+
 
   // === MORTGAGE PAGE ===
   // This adds the Mortgage service page: features, FAQ, and the mortgage form.
