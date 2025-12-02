@@ -414,6 +414,26 @@ Next: ${r.next}`;
   });
 };
 
+//clears the Immigration form after Submit
+const handleResetImmigrationForm = () => {
+  setImmigrationFormSubmitted(false);
+
+  setImmigrationFormData({
+    fullName: "",
+    email: "",
+    age: "",
+    education: "",
+    workExperience: "",
+    languageProficiency: "",
+    currentCountry: "",
+    intendedProvince: "",
+    familyInCanada: "",
+    budget: "",
+  });
+
+  setHasImmigrationConsent(false); // if you use the consent checkbox
+};
+
 
   // This handles Mortgage form submit and shows a success message
   
@@ -755,18 +775,31 @@ const renderImmigration = () => {
             </p>
           </div>
 
+      
           {immigrationFormSubmitted ? (
-            <Alert variant="success" className="text-center">
-              <i className="bi bi-check-circle-fill display-3 text-success mb-3"></i>
-              <Alert.Heading>Assessment Submitted Successfully!</Alert.Heading>
-              <p>
-                Thank you for completing our immigration assessment.
-                We’ve emailed your personalized program recommendations to the address you provided.
-              </p>
-            </Alert>
+            <div className="text-center">
+              <Alert variant="success" className="text-center">
+                <i className="bi bi-check-circle-fill display-3 text-success mb-3"></i>
+                <Alert.Heading>Assessment Submitted Successfully!</Alert.Heading>
+                <p>
+                  Thank you for completing our immigration assessment.
+                  We’ve emailed your personalized program recommendations to the address you provided.
+                </p>
+              </Alert>
+
+               <Button
+                  variant="main"
+                  size="lg"
+                  className="mt-3"
+                  onClick={handleResetImmigrationForm}
+                >
+                  <i className="bi bi-arrow-repeat me-2" aria-hidden="true"></i>
+                  Submit Another Request
+                </Button>
+            </div>
           ) : (
             <Form onSubmit={handleImmigrationSubmit}>
-              
+
               {/* FULL NAME + EMAIL */}
               <Row className="g-3 mb-3">
                 <Form.Group as={Col} md={6}>
