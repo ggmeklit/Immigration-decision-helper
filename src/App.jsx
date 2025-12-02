@@ -69,6 +69,8 @@ const App = () => {
   const [immigrationFormSubmitted, setImmigrationFormSubmitted] = useState(false);
   const [mortgageFormSubmitted, setMortgageFormSubmitted] = useState(false);
 
+  const [hasImmigrationConsent, setHasImmigrationConsent] = useState(false);
+
   // === CONTACT FORM STATE (EmailJS - NEW) ===
   const [contactForm, setContactForm] = useState({
     name: '',
@@ -393,6 +395,7 @@ Next: ${r.next}`;
   // === UI STATE: show success message + clear form ===
   setImmigrationFormSubmitted(true);
   setImmigrationResults(results); // keep in state if you ever need it later
+  setHasImmigrationConsent(false);
 
   setImmigrationFormData({
     fullName: "",
@@ -738,7 +741,7 @@ const renderImmigration = () => {
         </p>
       </div>
 
-      {/* === IMMIGRATION FORM — NOW MOVED TO THE TOP === */}
+   
 {/* === IMMIGRATION FORM — NOW MOVED TO THE TOP === */}
       <Card className="shadow-lg border-0 p-4 p-md-5 mb-5" id="immigration-form">
         <Card.Body>
@@ -763,7 +766,7 @@ const renderImmigration = () => {
             </Alert>
           ) : (
             <Form onSubmit={handleImmigrationSubmit}>
-
+              
               {/* FULL NAME + EMAIL */}
               <Row className="g-3 mb-3">
                 <Form.Group as={Col} md={6}>
@@ -998,14 +1001,42 @@ const renderImmigration = () => {
                   </Form.Select>
                 </Form.Group>
               </Row>
-
+              
+               {/* Disclaimer / Important Notice */}
               <Alert variant="info" className="small">
-                <strong>Note:</strong> This assessment is free and confidential and will be emailed to you. This assessment does not represent final decision or guaranteed determination of eligibility
+                <strong>Note:</strong> This assessment is free and confidential and will be emailed to you. 
+                <br />
+                This tool provides an <strong>informational eligibility assessment only</strong>.
+                It is not legal advice and does not guarantee immigration approval.
+
+                <ul className="mt-2 mb-0" style={{ paddingLeft: "20px" }}>
+                  <li>Uses publicly available IRCC and provincial government sources</li>
+                  <li>May contain outdated information — always verify on official sites</li>
+                  <li>
+                    Your data is collected for this assessment and may be stored securely to
+                    improve our services.
+                  </li>
+                  <li>For definitive advice, consult a licensed RCIC or immigration lawyer.</li>
+                </ul>
               </Alert>
 
+          <Form.Check
+            id="immigration-consent"
+            type="checkbox"
+            className="mb-4"
+            checked={hasImmigrationConsent}
+            onChange={(e) => setHasImmigrationConsent(e.target.checked)}
+            label="I understand and consent to proceed"
+          />
+
               <div className="d-grid mt-4">
-                <Button variant="main" type="submit" size="lg">
-                  <i className="bi bi-send me-2"></i>
+                <Button
+                  variant="main"
+                  type="submit"
+                  size="lg"
+                  disabled={!hasImmigrationConsent}
+                >
+                  <i className="bi bi-send me-2" aria-hidden="true"></i>
                   Get My Free Immigration Assessment
                 </Button>
               </div>
