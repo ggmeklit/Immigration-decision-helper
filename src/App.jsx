@@ -1351,8 +1351,35 @@ const renderImmigration = () => {
                   <Form.Group as={Col} md={6}><Form.Label>Email Address *</Form.Label><Form.Control type="email" name="email" value={mortgageFormData.email} onChange={handleMortgageInputChange} required/></Form.Group>
                 </Row>
                 <Row className="g-3 mb-3">
-                  <Form.Group as={Col} md={6}><Form.Label>Phone Number *</Form.Label><Form.Control type="tel" name="phone" value={mortgageFormData.phone} onChange={handleMortgageInputChange} required/></Form.Group>
-                  <Form.Group as={Col} md={6}><Form.Label>Employment Status *</Form.Label><Form.Select name="employmentStatus" value={mortgageFormData.employmentStatus} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="employed-full-time">Employed Full-Time</option><option value="employed-part-time">Employed Part-Time</option><option value="self-employed">Self-Employed</option><option value="unemployed">Unemployed</option></Form.Select></Form.Group>
+                  <Form.Group as={Col} md={6}>
+                  <Form.Label>Phone Number *</Form.Label>
+
+                  <PhoneInput
+                    international
+                    defaultCountry="CA"
+                    value={immigrationFormData.phone} 
+                    onChange={(value) => {
+                      setImmigrationFormData(prev => ({ ...prev, phone: value }));
+
+                      // VALIDATION (simple, no regex)
+                      if (!value) {
+                        setPhoneError("Please enter your phone number.");
+                      } else if (value.length < 10) {
+                        setPhoneError("Please check your phone number. It seems too short for this country.");
+                      } else {
+                        setPhoneError("");
+                      }
+                    }}
+                    className="PhoneInput form-control"
+                  />
+
+                  {phoneError && (
+                    <div style={{ color: "red", fontSize: "0.9rem", marginTop: "4px" }}>
+                      {phoneError}
+                    </div>
+                  )}
+                </Form.Group>
+                <Form.Group as={Col} md={6}><Form.Label>Employment Status *</Form.Label><Form.Select name="employmentStatus" value={mortgageFormData.employmentStatus} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="employed-full-time">Employed Full-Time</option><option value="employed-part-time">Employed Part-Time</option><option value="self-employed">Self-Employed</option><option value="unemployed">Unemployed</option></Form.Select></Form.Group>
                 </Row>
                 <Row className="g-3 mb-3">
                   <Form.Group as={Col} md={6}><Form.Label>Annual Household Income (CAD) *</Form.Label><Form.Select name="annualIncome" value={mortgageFormData.annualIncome} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="under-40k">Under $40,000</option><option value="40k-80k">$40k - $80k</option><option value="80k-150k">$80k - $150k</option><option value="150k+">$150,000+</option></Form.Select></Form.Group>
@@ -1385,6 +1412,8 @@ const renderImmigration = () => {
                     className="mb-4"
                     checked={hasMortgageConsent}
                     onChange={(e) => setHasMortgageConsent(e.target.checked)}
+                    autoComplete="off"
+                    defaultChecked={false}
                     label="I understand this is an estimate only and consent to proceed"
                   />
 
