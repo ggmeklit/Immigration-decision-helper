@@ -61,10 +61,20 @@ const App = () => {
 
   // Stores values for the Mortgage form
   const [mortgageFormData, setMortgageFormData] = useState({
-    fullName: '', email: '', phone: '', employmentStatus: '', annualIncome: '',
-    creditScore: '', downPayment: '', propertyType: '', propertyLocation: '',
-    firstTimeBuyer: '', newcomerStatus: ''
+    fullName: "",
+    email: "",
+    phone: "",
+    employmentStatus: "",
+    annualIncome: "",
+    creditScore: "",
+    downPayment: "",
+    propertyType: "",
+    propertyLocation: "",
+    firstTimeBuyer: "",
+    newcomerStatus: "",
   });
+
+const [hasMortgageConsent, setHasMortgageConsent] = useState(false);
   // Controls “submitted” success messages after each form submit
   const [immigrationFormSubmitted, setImmigrationFormSubmitted] = useState(false);
   const [mortgageFormSubmitted, setMortgageFormSubmitted] = useState(false);
@@ -314,6 +324,82 @@ const [phoneError, setPhoneError] = useState("");
 };
 
 
+// ---Providing mortgage assessment---
+  const buildMortgageResults = (data) => {
+    const results = [];
+
+    // 1) Strong file: good income + good credit + solid down payment
+    if (
+      ["80k-150k", "150k+"].includes(data.annualIncome) &&
+      ["excellent", "good"].includes(data.creditScore) &&
+      ["50k-100k", "100k+"].includes(data.downPayment)
+    ) {
+      results.push({
+        id: "prime",
+        title: "Strong Profile for Prime Mortgage Options",
+        tagline: "You may qualify for competitive rates with mainstream lenders.",
+        why:
+          "Your income, credit history, and down payment size indicate a strong overall file for traditional mortgage products.",
+        next:
+          "Gather income documents (NOAs, pay stubs, employment letter) and speak with a mortgage specialist to compare rates and terms.",
+      });
+    }
+
+    // 2) Newcomer / limited credit
+    if (data.newcomerStatus === "work-permit" || data.creditScore === "no-canadian-credit") {
+      results.push({
+        id: "newcomer",
+        title: "Newcomer / Limited Credit Mortgage Programs",
+        tagline: "Specialized programs are available for clients without long Canadian credit history.",
+        why:
+          "Many lenders have dedicated newcomer products that rely more on income, down payment, and overseas credit than on a long Canadian bureau.",
+        next:
+          "Prepare proof of status in Canada, work permit details (if applicable), and overseas credit statements if available.",
+      });
+    }
+
+    // 3) First-time buyer
+    if (data.firstTimeBuyer === "yes") {
+      results.push({
+        id: "first-time",
+        title: "First-Time Home Buyer Programs & Incentives",
+        tagline: "You may be eligible for rebates and incentives that reduce your upfront costs.",
+        why:
+          "First-time buyers may qualify for land transfer tax rebates and other programs depending on the province and purchase price.",
+        next:
+          "Ask a mortgage specialist to review first-time buyer incentives in your province and estimate your closing costs.",
+      });
+    }
+
+    // 4) Smaller down payment
+    if (["under-40k", "40k-80k"].includes(data.annualIncome) || data.downPayment === "under-10k") {
+      results.push({
+        id: "budget",
+        title: "Explore Entry-Level & Insured Mortgage Options",
+        tagline: "Lower down payment usually means focusing on insured or lower-price properties.",
+        why:
+          "With a smaller down payment or more modest income, it’s important to align expectations with realistic price ranges and insured lending rules.",
+        next:
+          "Work with a mortgage specialist to determine your maximum purchase price and monthly payment comfort zone.",
+      });
+    }
+
+    if (results.length === 0) {
+      results.push({
+        id: "general",
+        title: "Book a Personalized Mortgage Strategy Call",
+        tagline: "Your profile needs a tailored lender and product review.",
+        why:
+          "Based on the information provided, the best next step is a 1:1 review to map realistic budget, lenders, and timelines.",
+        next:
+          "Gather your income documents, down payment proof, and questions, then book a short consultation.",
+      });
+    }
+
+    return results;
+  };
+
+
   // === FORM SUBMIT HANDLERS (YOUR ORIGINAL) ===
   // This handles Immigration form submit and shows a success message
 
@@ -443,35 +529,72 @@ const handleResetImmigrationForm = () => {
 
 const handleMortgageSubmit = async (e) => {
   e.preventDefault();
+  console.log("Submitting mortgage form...", mortgageFormData);
 
-  // INSERT INTO SUPABASE
-  const { data, error } = await supabase
-    .from("immigration_forms")
-    .insert([
-      { 
-        full_name: immigrationFormData.fullName,
-        email: immigrationFormData.email,
-        age: immigrationFormData.age,
-        education: immigrationFormData.education,
-        work_experience: immigrationFormData.workExperience,
-        language: immigrationFormData.languageProficiency,
-        current_country: immigrationFormData.currentCountry,
-        intended_province: immigrationFormData.intendedProvince,
-        family_in_canada: immigrationFormData.familyInCanada,
-        budget: immigrationFormData.budget,
-        citizenship: immigrationFormData.citizenship,
-        submitted_at: new Date().toISOString(),
-       
-        
+  // === SAVE TO SUPABASE (optional, like immigration) ===
+  if (supabase) {
+    try {
+      const { error } = await supabase
+        .from("mortgage_forms")
+        .insert([
+          {
+            full_name: mortgageFormData.fullName,
+            email: mortgageFormData.email,
+            phone: mortgageFormData.phone,
+            employment_status: mortgageFormData.employmentStatus,
+            annual_income: mortgageFormData.annualIncome,
+            credit_score: mortgageFormData.creditScore,
+            down_payment: mortgageFormData.downPayment,
+            property_type: mortgageFormData.propertyType,
+            property_location: mortgageFormData.propertyLocation,
+            first_time_buyer: mortgageFormData.firstTimeBuyer,
+            newcomer_status: mortgageFormData.newcomerStatus,
+            submitted_at: new Date().toISOString(),
+          },
+        ]);
 
+      if (error) {
+        console.error("Supabase insert error (mortgage):", error);
       }
-    ]);
-
-  if (error) {
-    console.error(error);
-    alert("Could not save form to database.");
-    return;
+    } catch (err) {
+      console.error("Supabase runtime error (mortgage):", err);
+    }
+  } else {
+    console.warn("Supabase not configured, skipping mortgage DB insert.");
   }
+
+  // === BUILD RESULTS & FORMAT FOR EMAIL ===
+  const results = buildMortgageResults(mortgageFormData);
+
+  const formattedResults = results
+    .map((r, index) => {
+      return `${index + 1}. ${r.title}
+${r.tagline}
+Why: ${r.why}
+Next: ${r.next}`;
+    })
+    .join("\n\n");
+
+  try {
+    await emailjs.send(
+      EMAILJS.serviceId,
+      EMAILJS.imm_templateID, // use a dedicated email template
+      {
+        from_name: mortgageFormData.fullName || "ThriveBridge user",
+        from_email: mortgageFormData.email,
+        message: formattedResults,
+      },
+      EMAILJS.publicKey
+    );
+    console.log("Mortgage assessment email sent successfully");
+  } catch (err) {
+    console.error("Error sending mortgage email:", err);
+    alert(
+      "We generated your mortgage assessment but couldn't send the email automatically. " +
+      "Please contact us so we can resend it manually."
+    );
+  }
+
 
   // SUCCESS UI
   setMortgageFormSubmitted(true);
@@ -1245,11 +1368,36 @@ const renderImmigration = () => {
                 </Row>
                 <Form.Group className="mb-4"><Form.Label>Are you a newcomer to Canada? *</Form.Label><Form.Select name="newcomerStatus" value={mortgageFormData.newcomerStatus} onChange={handleMortgageInputChange} required><option value="">Permanent Resident</option><option value="work-permit">Work Permit</option><option value="planning-to-immigrate">Planning to Immigrate</option></Form.Select></Form.Group>
 
+                {/* Disclaimer / Important Notice */}
                 <Alert variant="info" className="small">
-                  <strong>Note:</strong> This mortgage assessment is completely free and confidential. We specialize in newcomer mortgages.
-                </Alert>
+                  <strong>Note:</strong> This mortgage assessment is free and confidential and will be emailed to you.
+                    It is an <strong>informational pre-qualification tool only</strong> and does not constitute a mortgage approval.
+                    <ul className="mt-2 mb-0" style={{ paddingLeft: "20px" }}>
+                    <li>Uses general lender guidelines and may not reflect all programs available in the market.</li>
+                    <li>Results are estimates only and can change based on full underwriting and documentation.</li>
+                    <li>Your data is collected securely and may be stored to help improve our services.</li>
+                    <li>For firm approval, speak directly with a licensed mortgage professional.</li>
+                    </ul>
+                  </Alert>
+                  <Form.Check
+                    id="mortgage-consent"
+                    type="checkbox"
+                    className="mb-4"
+                    checked={hasMortgageConsent}
+                    onChange={(e) => setHasMortgageConsent(e.target.checked)}
+                    label="I understand this is an estimate only and consent to proceed"
+                  />
+
                 <div className="d-grid mt-4">
-                  <Button variant="main" type="submit" size="lg"><i className="bi bi-send me-2" aria-hidden="true"></i>Get My Free Mortgage Assessment</Button>
+                  <Button
+                    variant="main"
+                    type="submit"
+                    size="lg"
+                    disabled={!hasMortgageConsent}
+                  >
+                    <i className="bi bi-send me-2" aria-hidden="true"></i>
+                    Get My Free Mortgage Assessment
+                  </Button>
                 </div>
               </Form>
             )}
