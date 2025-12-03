@@ -1379,21 +1379,98 @@ const renderImmigration = () => {
                     </div>
                   )}
                 </Form.Group>
-                <Form.Group as={Col} md={6}><Form.Label>Employment Status *</Form.Label><Form.Select name="employmentStatus" value={mortgageFormData.employmentStatus} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="employed-full-time">Employed Full-Time</option><option value="employed-part-time">Employed Part-Time</option><option value="self-employed">Self-Employed</option><option value="unemployed">Unemployed</option></Form.Select></Form.Group>
+                <Form.Group as={Col} md={6}><Form.Label>Employment Status *
+                  </Form.Label>
+                  <Form.Select name="employmentStatus" value={mortgageFormData.employmentStatus} onChange={handleMortgageInputChange} required>
+                    <option value="">Select...</option>
+                    <option value="employed-full-time">Employed Full-Time</option>
+                    <option value="employed-part-time">Employed Part-Time</option>
+                    <option value="self-employed">Self-Employed</option>
+                    <option value="unemployed">Unemployed</option>
+                  </Form.Select>
+                </Form.Group>
                 </Row>
                 <Row className="g-3 mb-3">
-                  <Form.Group as={Col} md={6}><Form.Label>Annual Household Income (CAD) *</Form.Label><Form.Select name="annualIncome" value={mortgageFormData.annualIncome} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="under-40k">Under $40,000</option><option value="40k-80k">$40k - $80k</option><option value="80k-150k">$80k - $150k</option><option value="150k+">$150,000+</option></Form.Select></Form.Group>
-                  <Form.Group as={Col} md={6}><Form.Label>Credit Score (if known) *</Form.Label><Form.Select name="creditScore" value={mortgageFormData.creditScore} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="excellent">Excellent (740+)</option><option value="good">Good (670-739)</option><option value="fair">Fair (580-669)</option><option value="no-canadian-credit">No Canadian Credit</option></Form.Select></Form.Group>
+                  <Form.Group as={Col} md={6}>
+                    <Form.Label>Annual Household Income (CAD) *</Form.Label>
+                      <Form.Select name="annualIncome" value={mortgageFormData.annualIncome} onChange={handleMortgageInputChange} required>
+                        <option value="">Select...</option>
+                        <option value="under-40k">Under $40,000</option>
+                        <option value="40k-80k">$40k - $80k</option>
+                        <option value="80k-150k">$80k - $150k</option>
+                        <option value="150k+">$150,000+</option>
+                      </Form.Select>
+                    </Form.Group>
+                  <Form.Group as={Col} md={6}>
+                    <Form.Label>Credit Score (if known) *</Form.Label>
+                     <Form.Select name="creditScore" value={mortgageFormData.creditScore} onChange={handleMortgageInputChange} required>
+                      <option value="">Select...</option>
+                      <option value="excellent">Excellent (740+)</option>
+                      <option value="good">Good (670-739)</option>
+                      <option value="fair">Fair (580-669)</option>
+                      <option value="no-canadian-credit">No Canadian Credit</option>
+                     </Form.Select>
+                    </Form.Group>
                 </Row>
                 <Row className="g-3 mb-3">
-                  <Form.Group as={Col} md={6}><Form.Label>Available Down Payment (CAD) *</Form.Label><Form.Select name="downPayment" value={mortgageFormData.downPayment} onChange={handleMortgageInputChange} required><option value="">Under $10,000</option><option value="10k-50k">$10k - $50k</option><option value="50k-100k">$50k - $100k</option><option value="100k+">$100,000+</option></Form.Select></Form.Group>
-                  <Form.Group as={Col} md={6}><Form.Label>Property Type *</Form.Label><Form.Select name="propertyType" value={mortgageFormData.propertyType} onChange={handleMortgageInputChange} required><option value="">Detached</option><option value="townhouse">Townhouse</option><option value="condo">Condo</option></Form.Select></Form.Group>
+                  <Form.Group as={Col} md={6}>
+                    <Form.Label>Available Down Payment (CAD) *</Form.Label>
+                     <Form.Select name="downPayment" value={mortgageFormData.downPayment} onChange={handleMortgageInputChange} required>
+                      <option value="">Select...</option>
+                      <option value="Under100k">Under $10,000</option>
+                      <option value="10k-50k">$10k - $50k</option>
+                      <option value="50k-100k">$50k - $100k</option>
+                      <option value="100k+">$100,000+</option>
+                     </Form.Select>
+                    </Form.Group>
+                  <Form.Group as={Col} md={6}>
+                    <Form.Label>Property Type *</Form.Label>
+                     <Form.Select name="propertyType" value={mortgageFormData.propertyType} onChange={handleMortgageInputChange} required>
+                      <option value="">Select...</option>
+                      <option value="detached">Detached</option>
+                      <option value="townhouse">Townhouse</option>
+                      <option value="condo">Condo</option>
+                     </Form.Select>
+                    </Form.Group>
                 </Row>
                 <Row className="g-3 mb-3">
-                  <Form.Group as={Col} md={6}><Form.Label>Preferred Property Location *</Form.Label><Form.Select name="propertyLocation" value={mortgageFormData.propertyLocation} onChange={handleMortgageInputChange} required><option value="">Toronto & GTA</option><option value="vancouver">Vancouver</option><option value="other">Other</option></Form.Select></Form.Group>
-                  <Form.Group as={Col} md={6}><Form.Label>First-Time Home Buyer? *</Form.Label><Form.Select name="firstTimeBuyer" value={mortgageFormData.firstTimeBuyer} onChange={handleMortgageInputChange} required><option value="">Yes</option><option value="no">No</option></Form.Select></Form.Group>
+                  <Form.Group as={Col} md={6}>
+                    <Form.Label>Preferred Property Location *</Form.Label>
+                     <Form.Select name="propertyLocation" value={mortgageFormData.propertyLocation} onChange={handleMortgageInputChange} required>
+                      <option value="">Select...</option>
+                      <option value="toronto-gta">Toronto & GTA</option>
+                      <option value="vancouver">Vancouver</option>
+                      <option value="other">Other</option>
+                     </Form.Select>
+                    </Form.Group>
+                  <Form.Group as={Col} md={6}>
+                    <Form.Label>First-Time Home Buyer? *</Form.Label>
+                    <Form.Select
+                      name="firstTimeBuyer"
+                      value={mortgageFormData.firstTimeBuyer}
+                      onChange={handleMortgageInputChange}
+                      required
+                    >
+                      <option value="">Select...</option>
+                      <option value="yes">Yes</option>
+                      <option value="no">No</option>
+                    </Form.Select>
+                  </Form.Group>
                 </Row>
-                <Form.Group className="mb-4"><Form.Label>Are you a newcomer to Canada? *</Form.Label><Form.Select name="newcomerStatus" value={mortgageFormData.newcomerStatus} onChange={handleMortgageInputChange} required><option value="">Permanent Resident</option><option value="work-permit">Work Permit</option><option value="planning-to-immigrate">Planning to Immigrate</option></Form.Select></Form.Group>
+                <Form.Group className="mb-4">
+                  <Form.Label>Are you a newcomer to Canada? *</Form.Label>
+                  <Form.Select
+                    name="newcomerStatus"
+                    value={mortgageFormData.newcomerStatus}
+                    onChange={handleMortgageInputChange}
+                    required
+                  >
+                    <option value="">Select...</option>
+                    <option value="permanent-resident">Permanent Resident</option>
+                    <option value="work-permit">Work Permit</option>
+                    <option value="planning-to-immigrate">Planning to Immigrate</option>
+                  </Form.Select>
+                </Form.Group>
 
                 {/* Disclaimer / Important Notice */}
                 <Alert variant="info" className="small">
