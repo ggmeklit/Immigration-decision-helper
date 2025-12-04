@@ -494,6 +494,35 @@ const buildMortgageResults = (data) => {
 };
 
 
+// Build the text that goes into the email {{message}} for MORTGAGE
+const buildMortgageEmailText = (formData) => {
+  const results = buildMortgageResults(formData);
+
+  return results
+    .map((r) => {
+      let block =
+        `${r.title}\n` +
+        `${r.tagline}\n\n` +
+        `Why: ${r.why}\n` +
+        `Next steps: ${r.next}`;
+
+      if (r.approxMortgage || r.approxPurchase) {
+        block += `\n\nEstimated budget (very rough only):`;
+        if (r.approxMortgage) {
+          block += `\n- ${r.approxMortgage}`;
+        }
+        if (r.approxPurchase) {
+          block += `\n- ${r.approxPurchase}`;
+        }
+      }
+
+      return block;
+    })
+    .join("\n\n------------------------\n\n");
+};
+
+
+
   // === FORM SUBMIT HANDLERS (YOUR ORIGINAL) ===
   // This handles Immigration form submit and shows a success message
 
@@ -659,6 +688,7 @@ const handleMortgageSubmit = async (e) => {
 
   // === BUILD RESULTS & FORMAT FOR EMAIL ===
   const results = buildMortgageResults(mortgageFormData);
+  const mortgageResultsMessage = buildMortgageEmailText(mortgageFormData);
 
   const formattedResults = results
     .map((r, index) => {
@@ -690,34 +720,6 @@ Next: ${r.next}`;
   }
   // SUCCESS UI
   setMortgageFormSubmitted(true);
-};
-
-
-// Build the text that goes into the email {{message}} for MORTGAGE
-const buildMortgageEmailText = (formData) => {
-  const results = buildMortgageResults(formData);
-
-  return results
-    .map((r) => {
-      let block =
-        `${r.title}\n` +
-        `${r.tagline}\n\n` +
-        `Why: ${r.why}\n` +
-        `Next steps: ${r.next}`;
-
-      if (r.approxMortgage || r.approxPurchase) {
-        block += `\n\nEstimated budget (very rough only):`;
-        if (r.approxMortgage) {
-          block += `\n- ${r.approxMortgage}`;
-        }
-        if (r.approxPurchase) {
-          block += `\n- ${r.approxPurchase}`;
-        }
-      }
-
-      return block;
-    })
-    .join("\n\n------------------------\n\n");
 };
 
 
