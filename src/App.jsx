@@ -649,7 +649,6 @@ const handleResetImmigrationForm = () => {
 
   // === CONTACT SUBMIT HANDLER (EmailJS - NEW) ===
 
-
 const handleMortgageSubmit = async (e) => {
   e.preventDefault();
   console.log("Submitting mortgage form...", mortgageFormData);
@@ -687,22 +686,12 @@ const handleMortgageSubmit = async (e) => {
   }
 
   // === BUILD RESULTS & FORMAT FOR EMAIL ===
-  const results = buildMortgageResults(mortgageFormData);
   const mortgageResultsMessage = buildMortgageEmailText(mortgageFormData);
-
-  const formattedResults = results
-    .map((r, index) => {
-      return `${index + 1}. ${r.title}
-${r.tagline}
-Why: ${r.why}
-Next: ${r.next}`;
-    })
-    .join("\n\n");
 
   try {
     await emailjs.send(
       EMAILJS.serviceId,
-      EMAILJS.imm_templateID, // use a dedicated email template
+      EMAILJS.imm_templateID, // or EMAILJS.mortgage_templateID if you have one
       {
         from_name: mortgageFormData.fullName || "ThriveBridge user",
         from_email: mortgageFormData.email,
@@ -715,13 +704,13 @@ Next: ${r.next}`;
     console.error("Error sending mortgage email:", err);
     alert(
       "We generated your mortgage assessment but couldn't send the email automatically. " +
-      "Please contact us so we can resend it manually."
+        "Please contact us so we can resend it manually."
     );
   }
+
   // SUCCESS UI
   setMortgageFormSubmitted(true);
 };
-
 
 
 //==MORTGAGE FORM RESET HANDLER
