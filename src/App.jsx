@@ -676,7 +676,7 @@ Next: ${r.next}`;
       {
         from_name: mortgageFormData.fullName || "ThriveBridge user",
         from_email: mortgageFormData.email,
-        message: formattedResults,
+        message: mortgageResultsMessage,
       },
       EMAILJS.publicKey
     );
@@ -691,6 +691,36 @@ Next: ${r.next}`;
   // SUCCESS UI
   setMortgageFormSubmitted(true);
 };
+
+
+// Build the text that goes into the email {{message}} for MORTGAGE
+const buildMortgageEmailText = (formData) => {
+  const results = buildMortgageResults(formData);
+
+  return results
+    .map((r) => {
+      let block =
+        `${r.title}\n` +
+        `${r.tagline}\n\n` +
+        `Why: ${r.why}\n` +
+        `Next steps: ${r.next}`;
+
+      if (r.approxMortgage || r.approxPurchase) {
+        block += `\n\nEstimated budget (very rough only):`;
+        if (r.approxMortgage) {
+          block += `\n- ${r.approxMortgage}`;
+        }
+        if (r.approxPurchase) {
+          block += `\n- ${r.approxPurchase}`;
+        }
+      }
+
+      return block;
+    })
+    .join("\n\n------------------------\n\n");
+};
+
+
 
 //==MORTGAGE FORM RESET HANDLER
 
