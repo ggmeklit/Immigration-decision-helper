@@ -594,13 +594,13 @@ Next: ${r.next}`;
       "Please contact us so we can resend it manually."
     );
   }
-
-
   // SUCCESS UI
   setMortgageFormSubmitted(true);
+};
 
-  // RESET FORM AFTER 5s
-  setTimeout(() => {
+//==MORTGAGE FORM RESET HANDLER
+
+  const handleResetMortgageForm = () => {
     setMortgageFormSubmitted(false);
     setMortgageFormData({
       fullName: '',
@@ -615,10 +615,9 @@ Next: ${r.next}`;
       firstTimeBuyer: '',
       newcomerStatus: '',
     });
-  }, 5000);
+    setHasMortgageConsent(false)
+  }
 
-  alert("Form submitted successfully!");
-};
   // === CONTACT SUBMIT HANDLER (EmailJS - NEW) ===
   const handleContactSubmit = async (e) => {
     e.preventDefault();
@@ -1176,14 +1175,14 @@ const renderImmigration = () => {
                 </ul>
               </Alert>
 
-          <Form.Check
-            id="immigration-consent"
-            type="checkbox"
-            className="mb-4"
-            checked={hasImmigrationConsent}
-            onChange={(e) => setHasImmigrationConsent(e.target.checked)}
-            label="I understand and consent to proceed"
-          />
+              <Form.Check
+                id="immigration-consent"
+                type="checkbox"
+                className="mb-4"
+                checked={hasImmigrationConsent}
+                onChange={(e) => setHasImmigrationConsent(e.target.checked)}
+                label="I understand and consent to proceed"
+              />
 
               <div className="d-grid mt-4">
                 <Button
@@ -1338,11 +1337,26 @@ const renderImmigration = () => {
 
             {mortgageFormSubmitted ? (
               // SUCCESS MESSAGE (shows after the form is submitted)
+              <div className="text-center">
               <Alert variant="success" className="text-center">
-                <i className="bi bi-check-circle-fill display-3 text-success mb-3" aria-hidden="true"></i>
+                <i className="bi bi-check-circle-fill display-3 text-success mb-3"></i>
                 <Alert.Heading>Assessment Submitted Successfully!</Alert.Heading>
-                <p>Thank you for completing our mortgage assessment. Our specialists will review your profile and send personalized options to your email within 24 hours.</p>
+                <p>
+                  Thank you for completing our mortgage assessment.
+                  We’ve emailed your personalized recommendations to the address you provided.
+                </p>
               </Alert>
+
+               <Button
+                  variant="main"
+                  size="lg"
+                  className="mt-3"
+                  onClick={handleResetMortgageForm}
+                >
+                  <i className="bi bi-arrow-repeat me-2" aria-hidden="true"></i>
+                  Submit Another Request
+                </Button>
+            </div>
             ) : (
               // MORTGAGE FORM FIELDS
               <Form onSubmit={handleMortgageSubmit}>
@@ -1357,9 +1371,9 @@ const renderImmigration = () => {
                   <PhoneInput
                     international
                     defaultCountry="CA"
-                    value={immigrationFormData.phone} 
+                    value={mortgageFormData.phone} 
                     onChange={(value) => {
-                      setImmigrationFormData(prev => ({ ...prev, phone: value }));
+                      setMortgageFormData(prev => ({ ...prev, phone: value }));
 
                       // VALIDATION (simple, no regex)
                       if (!value) {
