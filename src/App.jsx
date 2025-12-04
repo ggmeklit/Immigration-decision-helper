@@ -323,81 +323,175 @@ const [phoneError, setPhoneError] = useState("");
   return results;
 };
 
+// --- Helper: format currency in CAD ---
+const formatCurrencyCA = (value) =>
+  new Intl.NumberFormat("en-CA", {
+    style: "currency",
+    currency: "CAD",
+    maximumFractionDigits: 0,
+  }).format(value);
+
+// --- Helper: rough mortgage affordability estimate ---
+// NOTE: This is a *very* simplified educational estimate, not advice.
+const estimateMortgageAmount = (data) => {
+  // Approximate income midpoints
+  let incomeApprox;
+  switch (data.annualIncome) {
+    case "under-40k":
+      incomeApprox = 35000;
+      break;
+    case "40k-80k":
+      incomeApprox = 60000;
+      break;
+    case "80k-150k":
+      incomeApprox = 110000;
+      break;
+    case "150k+":
+      incomeApprox = 170000;
+      break;
+    default:
+      incomeApprox = 60000;
+  }
+
+  // Approximate down payment midpoints
+  let downPaymentApprox;
+  switch (data.downPayment) {
+    case "under-10k":
+      downPaymentApprox = 8000;
+      break;
+    case "50k-100k":
+      downPaymentApprox = 75000;
+      break;
+    case "100k+":
+      downPaymentApprox = 125000;
+      break;
+    default:
+      downPaymentApprox = 30000;
+  }
+
+  // Income multiplier based on credit quality (very rough)
+  let incomeFactor;
+  if (data.creditScore === "excellent") incomeFactor = 5.0;
+  else if (data.creditScore === "good") incomeFactor = 4.5;
+  else if (data.creditScore === "fair") incomeFactor = 4.0;
+  else incomeFactor = 3.5;
+
+  const baseLoan = incomeApprox * incomeFactor;
+
+  // Give a range around the base loan
+  const lowMortgage = baseLoan * 0.9;
+  const highMortgage = baseLoan * 1.1;
+
+  const lowPurchase = lowMortgage + downPaymentApprox;
+  const highPurchase = highMortgage + downPaymentApprox;
+
+  return {
+    mortgageRangeText:
+      `${formatCurrencyCA(lowMortgage)} – ${formatCurrencyCA(highMortgage)}`,
+    purchaseRangeText:
+      `${formatCurrencyCA(lowPurchase)} – ${formatCurrencyCA(highPurchase)}`,
+  };
+};
 
 // ---Providing mortgage assessment---
-  const buildMortgageResults = (data) => {
-    const results = [];
+  // ---Providing mortgage assessment---
+const buildMortgageResults = (data) => {
+  const results = [];
+  const approx = estimateMortgageAmount(data);
 
-    // 1) Strong file: good income + good credit + solid down payment
-    if (
-      ["80k-150k", "150k+"].includes(data.annualIncome) &&
-      ["excellent", "good"].includes(data.creditScore) &&
-      ["50k-100k", "100k+"].includes(data.downPayment)
-    ) {
-      results.push({
-        id: "prime",
-        title: "Strong Profile for Prime Mortgage Options",
-        tagline: "You may qualify for competitive rates with mainstream lenders.",
-        why:
-          "Your income, credit history, and down payment size indicate a strong overall file for traditional mortgage products.",
-        next:
-          "Gather income documents (NOAs, pay stubs, employment letter) and speak with a mortgage specialist to compare rates and terms.",
-      });
-    }
+  // 1) Strong file: good income + good credit + solid down payment
+  if (
+    ["80k-150k", "150k+"].includes(data.annualIncome) &&
+    ["excellent", "good"].includes(data.creditScore) &&
+    ["50k-100k", "100k+"].includes(data.downPayment)
+  ) {
+    results.push({
+      id: "prime",
+      title: "Strong Profile for Prime Mortgage Options",
+      tagline: "You may qualify for competitive rates with mainstream lenders.",
+      why:
+        "Your income, credit history, and down payment size indicate a strong overall file for traditional mortgage products.",
+      next:
+        "Gather income documents (NOAs, pay stubs, employment letter) and speak with a mortgage specialist to compare rates and terms.",
+      approxMortgage:
+        `Approximate mortgage amount you might qualify for: ${approx.mortgageRangeText}.`,
+      approxPurchase:
+        `Approximate purchase price range (including your down payment): ${approx.purchaseRangeText}.`,
+    });
+  }
 
-    // 2) Newcomer / limited credit
-    if (data.newcomerStatus === "work-permit" || data.creditScore === "no-canadian-credit") {
-      results.push({
-        id: "newcomer",
-        title: "Newcomer / Limited Credit Mortgage Programs",
-        tagline: "Specialized programs are available for clients without long Canadian credit history.",
-        why:
-          "Many lenders have dedicated newcomer products that rely more on income, down payment, and overseas credit than on a long Canadian bureau.",
-        next:
-          "Prepare proof of status in Canada, work permit details (if applicable), and overseas credit statements if available.",
-      });
-    }
+  // 2) Newcomer / limited credit
+  if (data.newcomerStatus === "work-permit" || data.creditScore === "no-canadian-credit") {
+    results.push({
+      id: "newcomer",
+      title: "Newcomer / Limited Credit Mortgage Programs",
+      tagline: "Specialized programs are available for clients without long Canadian credit history.",
+      why:
+        "Many lenders have dedicated newcomer products that rely more on income, down payment, and overseas credit than on a long Canadian bureau.",
+      next:
+        "Prepare proof of status in Canada, work permit details (if applicable), and overseas credit statements if available.",
+      approxMortgage:
+        `Very rough mortgage range based on your income and down payment: ${approx.mortgageRangeText}. Final eligibility depends on the specific newcomer program.`,
+      approxPurchase:
+        `Approximate purchase price range: ${approx.purchaseRangeText}.`,
+    });
+  }
 
-    // 3) First-time buyer
-    if (data.firstTimeBuyer === "yes") {
-      results.push({
-        id: "first-time",
-        title: "First-Time Home Buyer Programs & Incentives",
-        tagline: "You may be eligible for rebates and incentives that reduce your upfront costs.",
-        why:
-          "First-time buyers may qualify for land transfer tax rebates and other programs depending on the province and purchase price.",
-        next:
-          "Ask a mortgage specialist to review first-time buyer incentives in your province and estimate your closing costs.",
-      });
-    }
+  // 3) First-time buyer
+  if (data.firstTimeBuyer === "yes") {
+    results.push({
+      id: "first-time",
+      title: "First-Time Home Buyer Programs & Incentives",
+      tagline: "You may be eligible for rebates and incentives that reduce your upfront costs.",
+      why:
+        "First-time buyers may qualify for land transfer tax rebates and other programs depending on the province and purchase price.",
+      next:
+        "Ask a mortgage specialist to review first-time buyer incentives in your province and estimate your closing costs.",
+      approxMortgage:
+        `Approximate mortgage amount range: ${approx.mortgageRangeText}.`,
+      approxPurchase:
+        `Approximate purchase price range: ${approx.purchaseRangeText}.`,
+    });
+  }
 
-    // 4) Smaller down payment
-    if (["under-40k", "40k-80k"].includes(data.annualIncome) || data.downPayment === "under-10k") {
-      results.push({
-        id: "budget",
-        title: "Explore Entry-Level & Insured Mortgage Options",
-        tagline: "Lower down payment usually means focusing on insured or lower-price properties.",
-        why:
-          "With a smaller down payment or more modest income, it’s important to align expectations with realistic price ranges and insured lending rules.",
-        next:
-          "Work with a mortgage specialist to determine your maximum purchase price and monthly payment comfort zone.",
-      });
-    }
+  // 4) Smaller down payment / lower income
+  if (
+    ["under-40k", "40k-80k"].includes(data.annualIncome) ||
+    data.downPayment === "under-10k"
+  ) {
+    results.push({
+      id: "budget",
+      title: "Explore Entry-Level & Insured Mortgage Options",
+      tagline: "Lower down payment usually means focusing on insured or lower-price properties.",
+      why:
+        "With a smaller down payment or more modest income, it’s important to align expectations with realistic price ranges and insured lending rules.",
+      next:
+        "Work with a mortgage specialist to determine your maximum purchase price and monthly payment comfort zone.",
+      approxMortgage:
+        `Current rough mortgage estimate: ${approx.mortgageRangeText}.`,
+      approxPurchase:
+        `Estimated purchase price range: ${approx.purchaseRangeText}.`,
+    });
+  }
 
-    if (results.length === 0) {
-      results.push({
-        id: "general",
-        title: "Book a Personalized Mortgage Strategy Call",
-        tagline: "Your profile needs a tailored lender and product review.",
-        why:
-          "Based on the information provided, the best next step is a 1:1 review to map realistic budget, lenders, and timelines.",
-        next:
-          "Gather your income documents, down payment proof, and questions, then book a short consultation.",
-      });
-    }
+  if (results.length === 0) {
+    results.push({
+      id: "general",
+      title: "Book a Personalized Mortgage Strategy Call",
+      tagline: "Your profile needs a tailored lender and product review.",
+      why:
+        "Based on the information provided, the best next step is a 1:1 review to map realistic budget, lenders, and timelines.",
+      next:
+        "Gather your income documents, down payment proof, and questions, then book a short consultation.",
+      approxMortgage:
+        `Based on your answers, a rough mortgage range might be around ${approx.mortgageRangeText}, but a specialist will refine this.`,
+      approxPurchase:
+        `That would translate into an estimated purchase price range of ${approx.purchaseRangeText}.`,
+    });
+  }
 
-    return results;
-  };
+  return results;
+};
 
 
   // === FORM SUBMIT HANDLERS (YOUR ORIGINAL) ===
