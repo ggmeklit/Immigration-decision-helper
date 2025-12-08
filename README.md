@@ -1,16 +1,100 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# **We Built ThriveBridge.ca — A Digital Bridge to Help Newcomers Thrive in Canada**
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🎓 **Capstone Project Completion**
 
-## React Compiler
+After months of research, design, engineering, and collaboration, we’re proud to share our capstone project: **ThriveBridge.ca**, a digital platform built to empower global citizens navigating the journey of immigration, financial readiness, and career development in Canada.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+This project was more than a website — it was our attempt to solve a deeply human problem:
 
-## Expanding the ESLint configuration
+> **“Why is it so hard for newcomers to find clear, trustworthy guidance when starting a new life in Canada?”**
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+We wanted to change that.
+
+---
+
+## 🛠️ **What We Built**
+
+ThriveBridge integrates three essential pillars of settlement success:
+
+* 🧭 **Immigration & Settlement Readiness Assessment**
+  Resources for newcomers
+
+* 💰 **Financial & Mortgage Preparation Support**
+
+* 🧑‍💼 **Career & Life Coaching for Newcomers**
+
+All inside **one unified, user-friendly digital experience**.
+
+---
+
+## 👥 **Project Team**
+
+### 👩‍💼 **Project Lead: Semira Tesfai — Founder & Technical Project Manager**
+
+* Designed the UX strategy, wireframes, and full user journey
+* Created all branding, content, visuals, and conversion architecture
+* Defined the assessment logic and business funnel
+* Led team coordination between full-stack development & data science
+* Positioned the platform for AI/ML-driven scoring in the next phase
+
+---
+
+### 👩‍💻 **Full-Stack Developer: Meklit Gebregiorgis**
+
+* Built the front-end and back-end foundation
+* Developed custom features using HTML, JS, Python
+* Integrated Email.js and database
+* Managed code architecture in GitHub
+
+---
+
+### 📊 **Data Scientist: Anna Sagulenko**
+
+* Designed the assessment algorithm & scoring rubric
+* Created the decision-tree logic for user readiness
+* Modeled data inputs that will later support ML models
+* Ensured ethical data handling & scoring transparency
+
+---
+
+## ⭐ **Key Features**
+
+* 🌐 A real-world business website
+* 🧩 A three-pillar service model
+* 🔍 Custom decision-tree assessment algorithm
+* 📱 Strong UX and mobile-first design
+
+---
+
+## 🎓 **Built as Part of the MIT Emerging Talent Certificate Program**
+
+This project challenged us to integrate:
+
+* 💻 Full-stack development
+* 📊 Data science
+* 🎨 UX + conversion strategy
+* 🤝 Cross-functional teamwork
+
+We learned, struggled, iterated, debugged, redesigned — and ultimately **delivered something we’re proud of**.
+
+---
+
+## 🚀 **What’s Next?**
+
+ThriveBridge is now preparing for Phase 2, where we will begin integrating:
+
+* 🤖 **AI powered chat feature**
+* 📅 **Calendar and payment feature**
+* 🔧 **Further testing and feature improvements**
+
+---
+
+## 🔗 **Explore our project**
+
+* **Website:** [www.ThriveBridge.ca](http://www.ThriveBridge.ca)
+* **GitHub repo:** [https://github.com/ggmeklit/Immigration-decision-helper.git](https://github.com/ggmeklit/Immigration-decision-helper.git)
+
+---
