@@ -151,7 +151,7 @@ const MortgagePage = () => {
               </Alert>
 
               <Form.Check id="mortgage-consent" type="checkbox" className="mb-4" checked={hasMortgageConsent} onChange={(e) => setHasMortgageConsent(e.target.checked)} label="I understand this is an estimate only and consent to proceed" />
-              <div className="d-grid mt-4"><Button variant="main" type="submit" size="lg" disabled={!hasMortgageConsent}><i className="bi bi-send me-2"></i>Get Assessment</Button></div>
+              <div className="d-grid mt-4"><Button variant="main" type="submit" size="lg" disabled={!hasMortgageConsent}><i className="bi bi-send me-2"></i>Get Free Assessment</Button></div>
             </Form>
           )}
         </Card.Body>

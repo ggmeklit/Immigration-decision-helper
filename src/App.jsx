@@ -13,20 +13,24 @@ import CoachingPage from './components/CoachingPage';
 import ResourcesPage from './components/ResourcesPage';
 import AboutPage from './components/AboutPage';
 import ContactPage from './components/ContactPage';
+// Keeping this import but not rendering it
+import ImmigrationHelperBot from "./components/ImmigrationHelperBot"; 
 
-// YOUR CALENDLY LINK
+// YOUR LINKS
 const CALENDLY_URL = "https://calendly.com/infothrivebridge";
+
+// *** YOUR BEEHIIV NEWSLETTER LINK ***
+const NEWSLETTER_URL = "https://thrivebridges-newsletter.beehiiv.com/"; 
 
 const App = () => {
   const [activeTab, setActiveTab] = useState('home');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchNotFound, setSearchNotFound] = useState('');
-  const [showBookingModal, setShowBookingModal] = useState(false); // Controls the popup
-
-  // === FIX: SYNC BROWSER URL (Makes the Back button work) ===
-  useEffect(() => {
-    if (activeTab) window.location.hash = activeTab;
-  }, [activeTab]);
+  
+  // === MODAL STATE ===
+  const [showBookingModal, setShowBookingModal] = useState(false);       // Paid Appointment
+  const [showAssessmentModal, setShowAssessmentModal] = useState(false); // Free Assessment
+  const [showCommunityModal, setShowCommunityModal] = useState(false);   // Beehiiv Newsletter
 
   // === NAVIGATION HELPER ===
   const goTo = (tabId, anchorId) => {
@@ -62,6 +66,11 @@ const App = () => {
     setSearchQuery('');
     setSearchNotFound('');
   };
+
+  // === FIX: SYNC BROWSER URL ===
+  useEffect(() => {
+    if (activeTab) window.location.hash = activeTab;
+  }, [activeTab]);
 
   return (
     <div className="d-flex flex-column min-vh-100 bg-light-gray">
@@ -101,10 +110,12 @@ const App = () => {
       {/* CONTENT AREA */}
       <main className="flex-grow-1">
         <div style={{ display: activeTab === 'home' ? 'block' : 'none' }}>
-          {/* We pass setShowBookingModal and goTo so the buttons work */}
+          {/* Passing all modal setters */}
           <HomePage 
             setActiveTab={setActiveTab} 
             setShowBookingModal={setShowBookingModal} 
+            setShowAssessmentModal={setShowAssessmentModal} 
+            setShowCommunityModal={setShowCommunityModal} 
             goTo={goTo} 
           />
         </div>
@@ -146,39 +157,67 @@ const App = () => {
         </Container>
       </footer>
 
-      {/* === PROFESSIONAL ROUTING MODAL === */}
+      {/* === 1. BOOK APPOINTMENT MODAL (PAID) === */}
       <Modal show={showBookingModal} onHide={() => setShowBookingModal(false)} centered size="md">
         <Modal.Header closeButton className="border-0">
           <Modal.Title className="fw-bold text-primary-dark-green">Welcome to ThriveBridge</Modal.Title>
         </Modal.Header>
         <Modal.Body className="p-4 text-center">
           <p className="fs-5 mb-4">We are excited to welcome you! Which service would you like to book an appointment for?</p>
-          
           <Alert variant="info" className="small py-2 border-0 mb-4">
             <i className="bi bi-info-circle me-2"></i>
             Note: This is for paid appointments only (<strong>$200 CAD</strong>).
           </Alert>
-
           <div className="d-grid gap-3">
-            <Button variant="main" size="lg" href={CALENDLY_URL} target="_blank">
-              Immigration Appointment
-            </Button>
-            <Button variant="main" size="lg" href={CALENDLY_URL} target="_blank">
-              Mortgage Appointment
-            </Button>
+            <Button variant="main" size="lg" href={CALENDLY_URL} target="_blank">Immigration Appointment</Button>
+            <Button variant="main" size="lg" href={CALENDLY_URL} target="_blank">Mortgage Appointment</Button>
           </div>
-
           <div className="mt-4 pt-3 border-top">
             <p className="text-muted mb-2">Not ready to book yet?</p>
             <div className="d-flex justify-content-center gap-3">
-              <Button variant="link" className="p-0 text-decoration-none" onClick={() => { setShowBookingModal(false); goTo('immigration', 'immigration-form'); }}>
-                Take Free Assessment
-              </Button>
+              <Button variant="link" className="p-0 text-decoration-none" onClick={() => { setShowBookingModal(false); setShowAssessmentModal(true); }}>Take Free Assessment</Button>
               <span className="text-muted">|</span>
-              <Button variant="link" className="p-0 text-decoration-none" onClick={() => { setShowBookingModal(false); goTo('contact', 'contact-form'); }}>
-                Have questions? Contact us
-              </Button>
+              <Button variant="link" className="p-0 text-decoration-none" onClick={() => { setShowBookingModal(false); goTo('contact', 'contact-form'); }}>Have questions? Contact us</Button>
             </div>
+          </div>
+        </Modal.Body>
+      </Modal>
+
+      {/* === 2. FREE ASSESSMENT MODAL === */}
+      <Modal show={showAssessmentModal} onHide={() => setShowAssessmentModal(false)} centered size="md">
+        <Modal.Header closeButton className="border-0">
+          <Modal.Title className="fw-bold text-primary-dark-green">Select Your Free Assessment</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="p-4 text-center">
+          <p className="mb-4">Choose the assessment that best fits your needs to get started:</p>
+          <div className="d-grid gap-3">
+            <Button variant="main" size="lg" onClick={() => { setShowAssessmentModal(false); goTo('immigration', 'immigration-form'); }}>Free Immigration Assessment</Button>
+            <Button variant="main" size="lg" onClick={() => { setShowAssessmentModal(false); goTo('mortgage', 'mortgage-form'); }}>Free Mortgage Assessment</Button>
+            <div className="text-muted small my-1">- OR -</div>
+            <Button variant="accent" size="lg" onClick={() => { setShowAssessmentModal(false); setShowBookingModal(true); }}>Book Appointment with Expert (Paid)</Button>
+          </div>
+          <div className="mt-4 pt-3 border-top">
+             <Button variant="link" className="p-0 text-decoration-none" onClick={() => { setShowAssessmentModal(false); goTo('contact', 'contact-form'); }}>Have questions? Contact us</Button>
+          </div>
+        </Modal.Body>
+      </Modal>
+
+      {/* === 3. COMMUNITY / NEWSLETTER MODAL (BEEHIIV) === */}
+      <Modal show={showCommunityModal} onHide={() => setShowCommunityModal(false)} centered size="lg">
+        <Modal.Header closeButton className="border-0">
+          <Modal.Title className="fw-bold text-primary-dark-green">Join Our Community</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="p-0">
+          {/* LOADS YOUR BEEHIIV PAGE */}
+          <div style={{ width: '100%', height: '600px', overflow: 'hidden' }}>
+            <iframe 
+              src={NEWSLETTER_URL} 
+              width="100%" 
+              height="100%" 
+              frameBorder="0" 
+              style={{ border: 0 }}
+              title="Newsletter Subscription"
+            ></iframe>
           </div>
         </Modal.Body>
       </Modal>

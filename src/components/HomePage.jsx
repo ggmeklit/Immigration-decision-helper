@@ -4,8 +4,8 @@ import { services } from '../data';
 
 const keyMoment = "/newcomers_canada_group_toronto.png";
 
-// Receives props from App.jsx to handle navigation and the modal
-const HomePage = ({ setActiveTab, goTo, setShowBookingModal }) => {
+// Receives props from App.jsx to handle navigation and ALL modal triggers
+const HomePage = ({ setActiveTab, goTo, setShowBookingModal, setShowAssessmentModal, setShowCommunityModal }) => {
   return (
     <>
       {/* HERO SECTION */}
@@ -24,7 +24,7 @@ const HomePage = ({ setActiveTab, goTo, setShowBookingModal }) => {
                   Book Appointment Today
                 </Button>
                 
-                <Button variant="outline-light" size="lg" onClick={() => goTo('immigration', 'immigration-form')}>
+                <Button variant="outline-light" size="lg" onClick={() => setShowAssessmentModal(true)}>
                   Take Free Assessment
                 </Button>
 
@@ -32,8 +32,6 @@ const HomePage = ({ setActiveTab, goTo, setShowBookingModal }) => {
                   Learn More
                 </Button>
               </div>
-              {/* ==================== */}
-
             </Col>
             <Col lg={6}>
               <img src={keyMoment} alt="Newcomers in Canada" className="img-fluid rounded-3" style={{ width: "100%", height: "auto", objectFit: "cover" }} />
@@ -46,8 +44,8 @@ const HomePage = ({ setActiveTab, goTo, setShowBookingModal }) => {
       <section className="py-5">
         <Container className="py-md-5">
           <div className="text-center mb-5">
-            <h2 className="display-5 fw-bold text-primary-dark-green mb-3">Our Comprehensive Services</h2>
-            <p className="fs-5 text-muted mx-auto" style={{ maxWidth: '48rem' }}>Everything you need to build your new life in Canada.</p>
+            <h2 className="display-5 fw-bold text-primary-dark-green mb-3">Support for Every Stage of Your Journey</h2>
+            <p className="fs-5 text-muted mx-auto" style={{ maxWidth: '48rem' }}>Whether you’re planning your move, newly arrived, or ready to buy your first home, ThriveBridge gives you step‑by‑step support to navigate life in Canada.</p>
           </div>
           <Row xs={1} md={2} lg={4} className="g-4">
             {services.map((service) => (
@@ -72,12 +70,17 @@ const HomePage = ({ setActiveTab, goTo, setShowBookingModal }) => {
           <Row className="align-items-center g-5">
             <Col lg={6}>
               <h2 className="display-5 fw-bold text-primary-dark-green mb-4">Building Community Together</h2>
-              <p className="fs-5 text-muted mb-4">Connect with fellow newcomers, share experiences, and build lasting relationships in a supportive environment.</p>
-              <p className="mb-4">Our community hub provides workshops, networking events, and resources to help you feel at home.</p>
-              <Button variant="main" size="lg">Join Our Community</Button>
+              <p className="fs-5 text-muted mb-4">Get exclusive invitations to community events, special offers, and the latest tips and trends for newcomers.</p>
+              
+              {/* === JOIN COMMUNITY BUTTON (Triggers Beehiiv Modal) === */}
+              <Button variant="main" size="lg" onClick={() => setShowCommunityModal(true)}>
+                Join Our Community
+              </Button>
+              
             </Col>
             <Col lg={6}>
-              <img src="/community_hub.png" alt="Community hub" className="img-fluid rounded-3" style={{ width: "100%", height: "400px", objectFit: "cover" }} />
+              {/* Using your AI community image */}
+              <img src="/community_hub.jpg" alt="Community hub" className="img-fluid rounded-3" style={{ width: "100%", height: "400px", objectFit: "cover" }} />
             </Col>
           </Row>
         </Container>
