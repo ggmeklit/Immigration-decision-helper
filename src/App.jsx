@@ -18,8 +18,6 @@ import ImmigrationHelperBot from "./components/ImmigrationHelperBot";
 
 // YOUR LINKS
 const CALENDLY_URL = "https://calendly.com/infothrivebridge";
-
-// *** YOUR BEEHIIV NEWSLETTER LINK ***
 const NEWSLETTER_URL = "https://thrivebridges-newsletter.beehiiv.com/"; 
 
 const App = () => {
@@ -110,7 +108,6 @@ const App = () => {
       {/* CONTENT AREA */}
       <main className="flex-grow-1">
         <div style={{ display: activeTab === 'home' ? 'block' : 'none' }}>
-          {/* Passing all modal setters */}
           <HomePage 
             setActiveTab={setActiveTab} 
             setShowBookingModal={setShowBookingModal} 
@@ -139,19 +136,50 @@ const App = () => {
         </div>
       </main>
 
+      {/* === NEW: SIMPLE PRE-FOOTER === */}
+      <section className="py-5 bg-white border-top">
+        <Container className="text-center">
+          <Row className="justify-content-center">
+            <Col md={8} lg={6}>
+              <h3 className="fw-bold text-primary-dark-green mb-3">Need Professional Guidance?</h3>
+              <p className="fs-5 text-muted mb-4">
+                Click here for an expert appointment.
+              </p>
+              <Button variant="main" size="lg" onClick={() => setShowBookingModal(true)} className="px-5 shadow-sm">
+                Book Appointment
+              </Button>
+            </Col>
+          </Row>
+        </Container>
+      </section>
+
       {/* FOOTER */}
       <footer className="bg-primary-dark-green text-white py-5 mt-auto">
         <Container>
           <Row className="g-4">
-            <Col md={6}><h4 className="fs-3 fw-bold mb-3">ThriveBridge</h4><p className="text-white-50">Your trusted partner in building a successful life in Canada.</p></Col>
-            <Col md={3}><h5 className="fw-semibold mb-3">Quick Links</h5>
+            <Col md={6}>
+              <h4 className="fs-3 fw-bold mb-3">ThriveBridge</h4>
+              <p className="text-white-50">Your trusted partner in building a successful life in Canada.</p>
+            </Col>
+            
+            <Col md={3}>
+              <h5 className="fw-semibold mb-3">Quick Links</h5>
               <Nav className="flex-column">
                 {navigation.map((item) => (
                   <Nav.Link key={item.id} as="button" onClick={() => setActiveTab(item.id)} className="p-0 mb-2 footer-link text-start">{item.name}</Nav.Link>
                 ))}
               </Nav>
+              {/* REMOVED EXTRA BUTTON HERE AS REQUESTED */}
             </Col>
-            <Col md={3}><h5 className="fw-semibold mb-3">Contact Info</h5><ul className="list-unstyled text-white-50"><li className="mb-2"><i className="bi bi-envelope me-2"></i>semiratesfai11@gmail.com</li><li className="mb-2"><i className="bi bi-telephone me-2"></i>647-896-8004</li><li><i className="bi bi-geo-alt me-2"></i>Toronto, ON</li></ul></Col>
+            
+            <Col md={3}>
+              <h5 className="fw-semibold mb-3">Contact Info</h5>
+              <ul className="list-unstyled text-white-50">
+                <li className="mb-2"><i className="bi bi-envelope me-2"></i>semiratesfai11@gmail.com</li>
+                <li className="mb-2"><i className="bi bi-telephone me-2"></i>647-896-8004</li>
+                <li><i className="bi bi-geo-alt me-2"></i>Toronto, ON</li>
+              </ul>
+            </Col>
           </Row>
           <div className="border-top border-secondary mt-4 pt-4 text-center text-white-50"><p>&copy; 2024 ThriveBridge. All rights reserved.</p></div>
         </Container>
@@ -208,7 +236,6 @@ const App = () => {
           <Modal.Title className="fw-bold text-primary-dark-green">Join Our Community</Modal.Title>
         </Modal.Header>
         <Modal.Body className="p-0">
-          {/* LOADS YOUR BEEHIIV PAGE */}
           <div style={{ width: '100%', height: '600px', overflow: 'hidden' }}>
             <iframe 
               src={NEWSLETTER_URL} 

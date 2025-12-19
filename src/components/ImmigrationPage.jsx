@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { Form, Container, Button, Row, Col, Card, Alert } from "react-bootstrap";
-import PhoneInput from "react-phone-number-input";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import emailjs from '@emailjs/browser';
-import { supabase } from "../supabase"; // Note: Points to supabase.js in the parent folder
+import { supabase } from "../supabase"; 
 
-// Import the data we moved in Step 1
+// Import your data
 import { services, EMAILJS_CONFIG, countryOptions } from '../data';
 
-const ImmigrationPage = () => {
+const ImmigrationPage = ({ setActiveTab }) => {
   const service = services.find(s => s.id === 'immigration');
   const [immigrationFormSubmitted, setImmigrationFormSubmitted] = useState(false);
   const [hasImmigrationConsent, setHasImmigrationConsent] = useState(false);
@@ -43,6 +43,15 @@ const ImmigrationPage = () => {
 
   const handleImmigrationSubmit = async (e) => {
     e.preventDefault();
+
+    // 1. VALIDATION
+    if (!immigrationFormData.phone || !isValidPhoneNumber(immigrationFormData.phone)) {
+      setPhoneError("Please enter a valid phone number.");
+      return; 
+    }
+    setPhoneError("");
+
+    // 2. DATABASE INSERT
     const results = buildImmigrationResults(immigrationFormData);
     const formattedResults = results.map((r, index) => `${index + 1}. ${r.title}\n${r.tagline}\nWhy: ${r.why}\nNext: ${r.next}`).join("\n\n");
 
@@ -52,9 +61,10 @@ const ImmigrationPage = () => {
       } catch (err) { console.error("Supabase insert error:", err); }
     }
 
+    // 3. EMAIL
     try {
       await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.imm_templateID, { from_name: immigrationFormData.fullName, from_email: immigrationFormData.email, message: formattedResults }, EMAILJS_CONFIG.publicKey);
-    } catch (err) { alert("We generated your assessment but couldn't send the email automatically."); }
+    } catch (err) { console.error("EmailJS error:", err); }
 
     setImmigrationFormSubmitted(true);
     setHasImmigrationConsent(false);
@@ -68,12 +78,71 @@ const ImmigrationPage = () => {
 
   return (
     <Container className="py-5">
-      <div className="text-center mb-5"><h1 className="display-4 fw-bold text-primary-dark-green mb-3">{service.title}</h1><p className="fs-5 text-muted">{service.description}</p></div>
-      <Card className="shadow-lg border-0 p-4 p-md-5 mb-5" id="immigration-form">
+      {/* HEADER */}
+      <div className="text-center mb-5">
+        <h1 className="display-4 fw-bold text-primary-dark-green mb-3">{service.title}</h1>
+        <p className="fs-5 text-muted">{service.description}</p>
+      </div>
+      
+      {/* === COMPACT INFO SECTION (Side-by-Side to reduce scrolling) === */}
+      <Row className="g-4 mb-5">
+        
+        {/* LEFT: Our Process */}
+        <Col lg={6}>
+            <div className="bg-white rounded-3 p-4 shadow-sm border h-100">
+                <h3 className="fw-bold text-primary-dark-green mb-4 text-center">Our Process</h3>
+                <div className="d-flex flex-column gap-3">
+                    {service.details.process.map((step) => (
+                        <div key={step.step} className="d-flex align-items-center">
+                            <div className="flex-shrink-0 me-3">
+                                <div className="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold" style={{ width: "36px", height: "36px", backgroundColor: "#0f4d3a" }}>{step.step}</div>
+                            </div>
+                            <div>
+                                <h6 className="fw-bold text-primary-dark-green mb-0">{step.title}</h6>
+                                <small className="text-muted">{step.description}</small>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </Col>
+
+        {/* RIGHT: Success Stories */}
+        <Col lg={6}>
+            <div className="bg-light rounded-3 p-4 h-100 border">
+                <h3 className="fw-bold text-primary-dark-green mb-4 text-center">Success Stories</h3>
+                <div className="d-flex flex-column gap-3">
+                    {service.details.testimonials.map((t, i) => (
+                        <Card key={i} className="border-0 shadow-sm">
+                            <Card.Body className="p-3">
+                                <div className="d-flex align-items-center mb-2">
+                                    <div className="icon-box-fix bg-primary-dark-green text-white fs-6 me-2" style={{width:'32px', height:'32px'}}>
+                                        <i className="bi bi-person"></i>
+                                    </div>
+                                    <div>
+                                        <h6 className="fw-bold text-primary-dark-green mb-0" style={{fontSize:'0.9rem'}}>{t.name}</h6>
+                                        <div className="text-warning small"><i className="bi bi-star-fill" style={{fontSize:'0.7rem'}}></i><i className="bi bi-star-fill" style={{fontSize:'0.7rem'}}></i><i className="bi bi-star-fill" style={{fontSize:'0.7rem'}}></i><i className="bi bi-star-fill" style={{fontSize:'0.7rem'}}></i><i className="bi bi-star-fill" style={{fontSize:'0.7rem'}}></i></div>
+                                    </div>
+                                </div>
+                                <p className="text-muted fst-italic small mb-0">"{t.text}"</p>
+                            </Card.Body>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </Col>
+      </Row>
+
+      {/* === FORM SECTION (Full Width Bottom) === */}
+      <Card className="shadow-lg border-0 p-3 p-md-5" id="immigration-form">
         <Card.Body>
-          <div className="text-center mb-5"><h2 className="display-6 fw-bold text-primary-dark-green mb-3">Find Your Perfect Canadian Immigration Program</h2><p className="text-muted mx-auto" style={{ maxWidth: '48rem' }}>Take our free assessment to discover which Canadian immigration program best matches your profile. You'll receive a personalized analysis with program recommendations directly to your email .</p></div>
+          <div className="text-center mb-5">
+            <h2 className="display-6 fw-bold text-primary-dark-green mb-3">Find Your Perfect Canadian Immigration Program</h2>
+            <p className="text-muted mx-auto" style={{ maxWidth: '48rem' }}>Take our free assessment to discover which Canadian immigration program best matches your profile. You'll receive a personalized analysis with program recommendations directly to your email.</p>
+          </div>
+          
           {immigrationFormSubmitted ? (
-            <div className="text-center">
+            <div className="text-center py-5">
               <Alert variant="success" className="text-center"><i className="bi bi-check-circle-fill display-3 text-success mb-3"></i><Alert.Heading>Assessment Submitted Successfully!</Alert.Heading><p>Check your email for results.</p></Alert>
               <Button variant="main" size="lg" className="mt-3" onClick={handleResetImmigrationForm}><i className="bi bi-arrow-repeat me-2"></i>Submit Another Request</Button>
             </div>
@@ -86,8 +155,17 @@ const ImmigrationPage = () => {
               <Row className="g-3 mb-3">
                 <Form.Group as={Col} md={6}>
                   <Form.Label>Phone Number *</Form.Label>
-                  <PhoneInput international defaultCountry="CA" value={immigrationFormData.phone} onChange={(value) => { setImmigrationFormData(prev => ({ ...prev, phone: value })); if(!value) setPhoneError("Required"); else if(value.length < 10) setPhoneError("Too short"); else setPhoneError(""); }} className="PhoneInput form-control" />
-                  {phoneError && <div style={{ color: "red", fontSize: "0.9rem" }}>{phoneError}</div>}
+                  <PhoneInput 
+                    international 
+                    defaultCountry="CA" 
+                    value={immigrationFormData.phone} 
+                    onChange={(value) => { 
+                      setImmigrationFormData(prev => ({ ...prev, phone: value })); 
+                      if (value && isValidPhoneNumber(value)) { setPhoneError(""); }
+                    }} 
+                    className="PhoneInput form-control" 
+                  />
+                  {phoneError && <div style={{ color: "#dc3545", fontSize: "0.875rem", marginTop: "0.25rem" }}>{phoneError}</div>}
                 </Form.Group>
                 <Form.Group as={Col} md={6}><Form.Label>Current Country Of Residence *</Form.Label>
                   <Form.Select name="currentCountry" value={immigrationFormData.currentCountry} onChange={handleImmigrationInputChange} required>
@@ -130,26 +208,6 @@ const ImmigrationPage = () => {
           )}
         </Card.Body>
       </Card>
-
-      {/* PROCESS */}
-      <div className="bg-white rounded-3 p-4 p-md-5 mb-5 shadow-sm">
-        <h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">Our Immigration Process</h2>
-        <Row xs={1} md={2} lg={4} className="g-4 text-center">
-          {service.details.process.map((step) => (
-            <Col key={step.step}><Card className="h-100 shadow-sm border-light p-4"><Card.Body><div className="rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style={{ width: "48px", height: "48px", backgroundColor: "#0f4d3a", color: "white", fontWeight: "bold", fontSize: "1.25rem" }}>{step.step}</div><h5 className="fw-bold text-primary-dark-green mb-2">{step.title}</h5><p className="text-muted small mb-0">{step.description}</p></Card.Body></Card></Col>
-          ))}
-        </Row>
-      </div>
-
-      {/* TESTIMONIALS */}
-      <div className="bg-light rounded-3 p-4 p-md-5 mb-5">
-        <h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">Success Stories</h2>
-        <Row xs={1} md={2} className="g-4">
-          {service.details.testimonials.map((t, i) => (
-            <Col key={i}><Card className="shadow-sm border-0 h-100"><Card.Body className="p-4"><div className="d-flex align-items-center mb-3"><div className="icon-box-fix bg-primary-dark-green text-white fs-4 me-3"><i className="bi bi-person"></i></div><div><h6 className="fw-bold text-primary-dark-green mb-0">{t.name}</h6><div className="text-warning"><i className="bi bi-star-fill small"></i><i className="bi bi-star-fill small"></i><i className="bi bi-star-fill small"></i><i className="bi bi-star-fill small"></i><i className="bi bi-star-fill small"></i></div></div></div><p className="text-muted fst-italic">"{t.text}"</p></Card.Body></Card></Col>
-          ))}
-        </Row>
-      </div>
     </Container>
   );
 };

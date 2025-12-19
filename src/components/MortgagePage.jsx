@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Form, Container, Button, Row, Col, Card, Alert } from "react-bootstrap";
-import PhoneInput from "react-phone-number-input";
+import PhoneInput, { isValidPhoneNumber } from "react-phone-number-input";
 import "react-phone-number-input/style.css";
 import emailjs from '@emailjs/browser';
 import { supabase } from "../supabase";
 
-// Import data and helpers from our new data file
+// Import data and helpers
 import { services, EMAILJS_CONFIG, formatCurrencyCA } from '../data';
 
 const MortgagePage = () => {
@@ -82,17 +82,49 @@ const MortgagePage = () => {
 
   const handleMortgageSubmit = async (e) => {
     e.preventDefault();
+    
+    // 1. VALIDATION CHECK
+    if (!mortgageFormData.phone || !isValidPhoneNumber(mortgageFormData.phone)) {
+      setPhoneError("Please enter a valid phone number.");
+      return; 
+    }
+    setPhoneError("");
+
+    // 2. DATABASE INSERT (Including annual_income assuming you ran the SQL)
     if (supabase) {
       try {
-        await supabase.from("mortgage_forms").insert([{ full_name: mortgageFormData.fullName, email: mortgageFormData.email, phone: mortgageFormData.phone, employment_status: mortgageFormData.employmentStatus, annual_income: mortgageFormData.annualIncome, credit_score: mortgageFormData.creditScore, down_payment: mortgageFormData.downPayment, property_type: mortgageFormData.propertyType, property_location: mortgageFormData.propertyLocation, first_time_buyer: mortgageFormData.firstTimeBuyer, newcomer_status: mortgageFormData.newcomerStatus, submitted_at: new Date().toISOString() }]);
+        const { error } = await supabase.from("mortgage_forms").insert([
+          { 
+            full_name: mortgageFormData.fullName, 
+            email: mortgageFormData.email, 
+            phone: mortgageFormData.phone, 
+            down_payment: mortgageFormData.downPayment,       
+            property_location: mortgageFormData.propertyLocation, 
+            newcomer_status: mortgageFormData.newcomerStatus, 
+            credit_score: mortgageFormData.creditScore,       
+            employment_status: mortgageFormData.employmentStatus, 
+            property_type: mortgageFormData.propertyType,     
+            first_time_buyer: mortgageFormData.firstTimeBuyer,
+            annual_income: mortgageFormData.annualIncome, 
+            submitted_at: new Date().toISOString() 
+          }
+        ]);
+        
+        if (error) {
+            console.error("Supabase Error Details:", error);
+            alert("Database Error: " + error.message);
+            return; 
+        }
       } catch (err) { console.error("Supabase error (mortgage):", err); }
     }
+
     const results = buildMortgageResults(mortgageFormData);
     const msg = results.map(r => `${r.title}\n${r.tagline}\nWhy: ${r.why}\nNext: ${r.next}\n${r.approxMortgage || ''}\n${r.approxPurchase || ''}`).join("\n\n------------------------\n\n");
 
     try {
       await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.imm_templateID, { from_name: mortgageFormData.fullName, from_email: mortgageFormData.email, message: msg }, EMAILJS_CONFIG.publicKey);
-    } catch (err) { alert("Could not send email automatically."); }
+    } catch (err) { console.error("EmailJS Error", err); }
+    
     setMortgageFormSubmitted(true);
   };
 
@@ -104,17 +136,59 @@ const MortgagePage = () => {
 
   return (
     <Container className="py-5">
-      <div className="text-center mb-5"><h1 className="display-4 fw-bold text-primary-dark-green mb-3">{service.title}</h1><p className="fs-5 text-muted">{service.description}</p></div>
-      <div className="mb-5"><h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">Why Choose Our Mortgage Services?</h2>
-        <Row xs={1} md={2} lg={3} className="g-4">{service.details.features.map((f, i) => (<Col key={i}><Card className="h-100 shadow-sm border-light"><Card.Body className="d-flex align-items-center p-4"><i className="bi bi-check-circle-fill text-success fs-4 me-3"></i><span className="text-muted">{f}</span></Card.Body></Card></Col>))}</Row>
+      {/* HEADER */}
+      <div className="text-center mb-5">
+        <h1 className="display-4 fw-bold text-primary-dark-green mb-3">{service.title}</h1>
+        <p className="fs-5 text-muted">{service.description}</p>
       </div>
-      <div className="bg-light rounded-3 p-4 p-md-5 mb-5"><h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">Frequently Asked Questions</h2><Row xs={1} md={1} className="g-4">{service.details.faq.map((item, i) => (<Col key={i}><Card className="shadow-sm border-0"><Card.Body className="p-4"><h5 className="fw-bold text-primary-dark-green mb-2">{item.question}</h5><p className="text-muted mb-0">{item.answer}</p></Card.Body></Card></Col>))}</Row></div>
 
+      {/* 1. FEATURES GRID */}
+      <div className="mb-5">
+        <h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">Why Choose Our Mortgage Services?</h2>
+        <Row xs={1} md={2} lg={3} className="g-4">
+          {service.details.features.map((f, i) => (
+            <Col key={i}>
+              <Card className="h-100 shadow-sm border-light">
+                <Card.Body className="d-flex align-items-center p-4">
+                  <i className="bi bi-check-circle-fill text-success fs-4 me-3"></i>
+                  <span className="text-muted">{f}</span>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </div>
+
+      {/* 2. FAQ SECTION */}
+      <div className="bg-light rounded-3 p-4 p-md-5 mb-5">
+        <h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">Frequently Asked Questions</h2>
+        <Row xs={1} md={1} className="g-4">
+          {service.details.faq.map((item, i) => (
+            <Col key={i}>
+              <Card className="shadow-sm border-0">
+                <Card.Body className="p-4">
+                  <h5 className="fw-bold text-primary-dark-green mb-2">{item.question}</h5>
+                  <p className="text-muted mb-0">{item.answer}</p>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      </div>
+
+      {/* 3. FORM CARD */}
       <Card className="shadow-lg border-0 p-4 p-md-5" id="mortgage-form">
         <Card.Body>
-          <div className="text-center mb-5"><h2 className="display-6 fw-bold text-primary-dark-green mb-3">Discover Your Mortgage Options</h2><p className="text-muted mx-auto">Complete our free mortgage assessment to understand what you may qualify for as a newcomer to Canada.</p></div>
+          <div className="text-center mb-5">
+            <h2 className="display-6 fw-bold text-primary-dark-green mb-3">Discover Your Mortgage Options</h2>
+            <p className="text-muted mx-auto">Complete our free mortgage assessment to understand what you may qualify for as a newcomer to Canada.</p>
+          </div>
+          
           {mortgageFormSubmitted ? (
-             <div className="text-center"><Alert variant="success"><i className="bi bi-check-circle-fill display-3 text-success mb-3"></i><Alert.Heading>Submitted Successfully!</Alert.Heading><p>Check your email for results.</p></Alert><Button variant="main" size="lg" className="mt-3" onClick={handleResetMortgageForm}>Submit Another Request</Button></div>
+              <div className="text-center">
+                <Alert variant="success"><i className="bi bi-check-circle-fill display-3 text-success mb-3"></i><Alert.Heading>Submitted Successfully!</Alert.Heading><p>Check your email for results.</p></Alert>
+                <Button variant="main" size="lg" className="mt-3" onClick={handleResetMortgageForm}>Submit Another Request</Button>
+              </div>
           ) : (
             <Form onSubmit={handleMortgageSubmit}>
               <Row className="g-3 mb-3">
@@ -122,20 +196,33 @@ const MortgagePage = () => {
                 <Form.Group as={Col} md={6}><Form.Label>Email Address*</Form.Label><Form.Control type="email" name="email" value={mortgageFormData.email} onChange={handleMortgageInputChange} required/></Form.Group>
               </Row>
               <Row className="g-3 mb-3">
-                 <Form.Group as={Col} md={6}><Form.Label>Phone Number *</Form.Label><PhoneInput international defaultCountry="CA" value={mortgageFormData.phone} onChange={(val) => { setMortgageFormData(prev => ({ ...prev, phone: val })); if(!val) setPhoneError("Required"); else if(val.length < 10) setPhoneError("Too short"); else setPhoneError(""); }} className="PhoneInput form-control" />{phoneError && <div style={{color:"red", fontSize:"0.9rem"}}>{phoneError}</div>}</Form.Group>
-                 <Form.Group as={Col} md={6}><Form.Label>Employment Status *</Form.Label><Form.Select name="employmentStatus" value={mortgageFormData.employmentStatus} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="employed-full-time">Full-Time</option><option value="employed-part-time">Part-Time</option><option value="self-employed">Self-Employed</option><option value="unemployed">Unemployed</option></Form.Select></Form.Group>
+                  <Form.Group as={Col} md={6}>
+                    <Form.Label>Phone Number *</Form.Label>
+                    <PhoneInput 
+                      international 
+                      defaultCountry="CA" 
+                      value={mortgageFormData.phone} 
+                      onChange={(val) => { 
+                        setMortgageFormData(prev => ({ ...prev, phone: val })); 
+                        if (val && isValidPhoneNumber(val)) setPhoneError(""); 
+                      }} 
+                      className="PhoneInput form-control" 
+                    />
+                    {phoneError && <div style={{color:"#dc3545", fontSize:"0.875rem", marginTop: "0.25rem"}}>{phoneError}</div>}
+                  </Form.Group>
+                  <Form.Group as={Col} md={6}><Form.Label>Employment Status *</Form.Label><Form.Select name="employmentStatus" value={mortgageFormData.employmentStatus} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="employed-full-time">Full-Time</option><option value="employed-part-time">Part-Time</option><option value="self-employed">Self-Employed</option><option value="unemployed">Unemployed</option></Form.Select></Form.Group>
               </Row>
               <Row className="g-3 mb-3">
-                 <Form.Group as={Col} md={6}><Form.Label>Annual Household Income (CAD) *</Form.Label><Form.Select name="annualIncome" value={mortgageFormData.annualIncome} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="under-40k">Under $40k</option><option value="40k-80k">$40k-$80k</option><option value="80k-150k">$80k-$150k</option><option value="150k+">$150k+</option></Form.Select></Form.Group>
-                 <Form.Group as={Col} md={6}><Form.Label>Credit Score *</Form.Label><Form.Select name="creditScore" value={mortgageFormData.creditScore} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="excellent">Excellent (740+)</option><option value="good">Good (670-739)</option><option value="fair">Fair (580-669)</option><option value="no-canadian-credit">No Canadian Credit</option></Form.Select></Form.Group>
+                  <Form.Group as={Col} md={6}><Form.Label>Annual Household Income (CAD) *</Form.Label><Form.Select name="annualIncome" value={mortgageFormData.annualIncome} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="under-40k">Under $40k</option><option value="40k-80k">$40k-$80k</option><option value="80k-150k">$80k-$150k</option><option value="150k+">$150k+</option></Form.Select></Form.Group>
+                  <Form.Group as={Col} md={6}><Form.Label>Credit Score *</Form.Label><Form.Select name="creditScore" value={mortgageFormData.creditScore} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="excellent">Excellent (740+)</option><option value="good">Good (670-739)</option><option value="fair">Fair (580-669)</option><option value="no-canadian-credit">No Canadian Credit</option></Form.Select></Form.Group>
               </Row>
               <Row className="g-3 mb-3">
-                 <Form.Group as={Col} md={6}><Form.Label>Available Down Payment (CAD) *</Form.Label><Form.Select name="downPayment" value={mortgageFormData.downPayment} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="Under100k">Under $10k</option><option value="10k-50k">$10k-$50k</option><option value="50k-100k">$50k-$100k</option><option value="100k+">$100k+</option></Form.Select></Form.Group>
-                 <Form.Group as={Col} md={6}><Form.Label>Property Type *</Form.Label><Form.Select name="propertyType" value={mortgageFormData.propertyType} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="detached">Detached</option><option value="townhouse">Townhouse</option><option value="condo">Condo</option></Form.Select></Form.Group>
+                  <Form.Group as={Col} md={6}><Form.Label>Available Down Payment (CAD) *</Form.Label><Form.Select name="downPayment" value={mortgageFormData.downPayment} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="Under100k">Under $10k</option><option value="10k-50k">$10k-$50k</option><option value="50k-100k">$50k-$100k</option><option value="100k+">$100k+</option></Form.Select></Form.Group>
+                  <Form.Group as={Col} md={6}><Form.Label>Property Type *</Form.Label><Form.Select name="propertyType" value={mortgageFormData.propertyType} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="detached">Detached</option><option value="townhouse">Townhouse</option><option value="condo">Condo</option></Form.Select></Form.Group>
               </Row>
               <Row className="g-3 mb-3">
-                 <Form.Group as={Col} md={6}><Form.Label>Preferred Property Location *</Form.Label><Form.Select name="propertyLocation" value={mortgageFormData.propertyLocation} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="toronto-gta">Toronto & GTA</option><option value="vancouver">Vancouver</option><option value="other">Other</option></Form.Select></Form.Group>
-                 <Form.Group as={Col} md={6}><Form.Label>First-Time Buyer? *</Form.Label><Form.Select name="firstTimeBuyer" value={mortgageFormData.firstTimeBuyer} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></Form.Select></Form.Group>
+                  <Form.Group as={Col} md={6}><Form.Label>Preferred Property Location *</Form.Label><Form.Select name="propertyLocation" value={mortgageFormData.propertyLocation} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="toronto-gta">Toronto & GTA</option><option value="vancouver">Vancouver</option><option value="other">Other</option></Form.Select></Form.Group>
+                  <Form.Group as={Col} md={6}><Form.Label>First-Time Buyer? *</Form.Label><Form.Select name="firstTimeBuyer" value={mortgageFormData.firstTimeBuyer} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></Form.Select></Form.Group>
               </Row>
               <Form.Group className="mb-4"><Form.Label>Are you Newcomer to Canada? *</Form.Label><Form.Select name="newcomerStatus" value={mortgageFormData.newcomerStatus} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="permanent-resident">Permanent Resident</option><option value="work-permit">Work Permit</option><option value="planning-to-immigrate">Planning to Immigrate</option></Form.Select></Form.Group>
 
