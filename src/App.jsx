@@ -13,8 +13,6 @@ import CoachingPage from './components/CoachingPage';
 import ResourcesPage from './components/ResourcesPage';
 import AboutPage from './components/AboutPage';
 import ContactPage from './components/ContactPage';
-// Keeping this import but not rendering it
-import ImmigrationHelperBot from "./components/ImmigrationHelperBot"; 
 
 // YOUR LINKS
 const CALENDLY_URL = "https://calendly.com/infothrivebridge";
@@ -26,9 +24,9 @@ const App = () => {
   const [searchNotFound, setSearchNotFound] = useState('');
   
   // === MODAL STATE ===
-  const [showBookingModal, setShowBookingModal] = useState(false);       // Paid Appointment
-  const [showAssessmentModal, setShowAssessmentModal] = useState(false); // Free Assessment
-  const [showCommunityModal, setShowCommunityModal] = useState(false);   // Beehiiv Newsletter
+  const [showBookingModal, setShowBookingModal] = useState(false);       
+  const [showAssessmentModal, setShowAssessmentModal] = useState(false); 
+  const [showCommunityModal, setShowCommunityModal] = useState(false);   
 
   // === NAVIGATION HELPER ===
   const goTo = (tabId, anchorId) => {
@@ -71,7 +69,7 @@ const App = () => {
   }, [activeTab]);
 
   return (
-    <div className="d-flex flex-column min-vh-100 bg-light-gray">
+    <div className="d-flex flex-column min-vh-100 bg-light-gray position-relative">
       <style>{`.icon-box-fix { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; border-radius: 12px; overflow: visible; line-height: 1; } .icon-box-fix .bi { font-size: 28px; line-height: 1; display: inline-block; vertical-align: middle; }`}</style>
 
       {/* NAVBAR */}
@@ -136,22 +134,20 @@ const App = () => {
         </div>
       </main>
 
-      {/* === NEW: SIMPLE PRE-FOOTER === */}
-      <section className="py-5 bg-white border-top">
-        <Container className="text-center">
-          <Row className="justify-content-center">
-            <Col md={8} lg={6}>
-              <h3 className="fw-bold text-primary-dark-green mb-3">Need Professional Guidance?</h3>
-              <p className="fs-5 text-muted mb-4">
-                Click here for an expert appointment.
-              </p>
-              <Button variant="main" size="lg" onClick={() => setShowBookingModal(true)} className="px-5 shadow-sm">
-                Book Appointment
-              </Button>
-            </Col>
-          </Row>
-        </Container>
-      </section>
+      {/* === REMOVED: The old 'Need Professional Guidance' Section === */}
+
+      {/* === NEW: GOLDEN POP UP (Sticky Button) === */}
+      <div className="position-fixed bottom-0 end-0 p-4" style={{ zIndex: 1050 }}>
+        <Button 
+          variant="warning" 
+          className="shadow-lg rounded-pill fw-bold py-3 px-4 d-flex align-items-center gap-2 border-0"
+          style={{ transform: 'scale(1.05)', fontSize: '1.1rem' }} 
+          onClick={() => setShowBookingModal(true)}
+        >
+          <i className="bi bi-person-check-fill fs-4"></i>
+          <span>Speak to an Expert</span>
+        </Button>
+      </div>
 
       {/* FOOTER */}
       <footer className="bg-primary-dark-green text-white py-5 mt-auto">
@@ -169,7 +165,6 @@ const App = () => {
                   <Nav.Link key={item.id} as="button" onClick={() => setActiveTab(item.id)} className="p-0 mb-2 footer-link text-start">{item.name}</Nav.Link>
                 ))}
               </Nav>
-              {/* REMOVED EXTRA BUTTON HERE AS REQUESTED */}
             </Col>
             
             <Col md={3}>

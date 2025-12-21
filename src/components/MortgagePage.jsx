@@ -90,7 +90,11 @@ const MortgagePage = () => {
     }
     setPhoneError("");
 
-    // 2. DATABASE INSERT (Including annual_income assuming you ran the SQL)
+    // --- NEW: Generate Results FIRST so we can save to DB ---
+    const results = buildMortgageResults(mortgageFormData);
+    const msg = results.map(r => `${r.title}\n${r.tagline}\nWhy: ${r.why}\nNext: ${r.next}\n${r.approxMortgage || ''}\n${r.approxPurchase || ''}`).join("\n\n------------------------\n\n");
+
+    // 2. DATABASE INSERT
     if (supabase) {
       try {
         const { error } = await supabase.from("mortgage_forms").insert([
@@ -106,6 +110,7 @@ const MortgagePage = () => {
             property_type: mortgageFormData.propertyType,     
             first_time_buyer: mortgageFormData.firstTimeBuyer,
             annual_income: mortgageFormData.annualIncome, 
+            assessment_result: msg, // <--- SAVING THE EMAIL RESULT TO DATABASE
             submitted_at: new Date().toISOString() 
           }
         ]);
@@ -118,9 +123,7 @@ const MortgagePage = () => {
       } catch (err) { console.error("Supabase error (mortgage):", err); }
     }
 
-    const results = buildMortgageResults(mortgageFormData);
-    const msg = results.map(r => `${r.title}\n${r.tagline}\nWhy: ${r.why}\nNext: ${r.next}\n${r.approxMortgage || ''}\n${r.approxPurchase || ''}`).join("\n\n------------------------\n\n");
-
+    // 3. SEND EMAIL (Using the same 'msg')
     try {
       await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.imm_templateID, { from_name: mortgageFormData.fullName, from_email: mortgageFormData.email, message: msg }, EMAILJS_CONFIG.publicKey);
     } catch (err) { console.error("EmailJS Error", err); }
@@ -142,41 +145,44 @@ const MortgagePage = () => {
         <p className="fs-5 text-muted">{service.description}</p>
       </div>
 
-      {/* 1. FEATURES GRID */}
-      <div className="mb-5">
-        <h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">Why Choose Our Mortgage Services?</h2>
-        <Row xs={1} md={2} lg={3} className="g-4">
-          {service.details.features.map((f, i) => (
-            <Col key={i}>
-              <Card className="h-100 shadow-sm border-light">
-                <Card.Body className="d-flex align-items-center p-4">
-                  <i className="bi bi-check-circle-fill text-success fs-4 me-3"></i>
-                  <span className="text-muted">{f}</span>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </div>
+      {/* === COMPACT INFO SECTION (Side-by-Side) === */}
+      <Row className="g-4 mb-5">
+        
+        {/* LEFT: Why Choose Us (Features) */}
+        <Col lg={6}>
+            <div className="bg-white rounded-3 p-4 shadow-sm border h-100">
+                <h3 className="fw-bold text-primary-dark-green mb-4 text-start">Why Choose Our Mortgage Services?</h3>
+                
+                <div className="d-flex flex-column gap-3">
+                    {service.details.features.map((f, i) => (
+                        <div key={i} className="d-flex align-items-center">
+                            <i className="bi bi-check-circle-fill text-success fs-4 me-3 flex-shrink-0"></i>
+                            <span className="text-muted">{f}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </Col>
 
-      {/* 2. FAQ SECTION */}
-      <div className="bg-light rounded-3 p-4 p-md-5 mb-5">
-        <h2 className="text-center display-6 fw-bold text-primary-dark-green mb-5">Frequently Asked Questions</h2>
-        <Row xs={1} md={1} className="g-4">
-          {service.details.faq.map((item, i) => (
-            <Col key={i}>
-              <Card className="shadow-sm border-0">
-                <Card.Body className="p-4">
-                  <h5 className="fw-bold text-primary-dark-green mb-2">{item.question}</h5>
-                  <p className="text-muted mb-0">{item.answer}</p>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </div>
+        {/* RIGHT: Frequently Asked Questions (FAQ) */}
+        <Col lg={6}>
+            <div className="bg-light rounded-3 p-4 h-100 border">
+                <h3 className="fw-bold text-primary-dark-green mb-4 text-center">Frequently Asked Questions</h3>
+                <div className="d-flex flex-column gap-3">
+                    {service.details.faq.map((item, i) => (
+                        <Card key={i} className="border-0 shadow-sm">
+                            <Card.Body className="p-3">
+                                <h6 className="fw-bold text-primary-dark-green mb-1">{item.question}</h6>
+                                <p className="text-muted small mb-0">{item.answer}</p>
+                            </Card.Body>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </Col>
+      </Row>
 
-      {/* 3. FORM CARD */}
+      {/* === FORM SECTION (Full Width Bottom) === */}
       <Card className="shadow-lg border-0 p-4 p-md-5" id="mortgage-form">
         <Card.Body>
           <div className="text-center mb-5">
@@ -238,7 +244,7 @@ const MortgagePage = () => {
               </Alert>
 
               <Form.Check id="mortgage-consent" type="checkbox" className="mb-4" checked={hasMortgageConsent} onChange={(e) => setHasMortgageConsent(e.target.checked)} label="I understand this is an estimate only and consent to proceed" />
-              <div className="d-grid mt-4"><Button variant="main" type="submit" size="lg" disabled={!hasMortgageConsent}><i className="bi bi-send me-2"></i>Get Free Assessment</Button></div>
+              <div className="d-grid mt-4"><Button variant="main" type="submit" size="lg" disabled={!hasMortgageConsent}><i className="bi bi-send me-2"></i>Get My Free Assessment</Button></div>
             </Form>
           )}
         </Card.Body>

@@ -111,12 +111,12 @@ export const services = [
   {
     id: 'resources',
     title: 'Educational Resources',
-    description: 'Parent-Child Learning Tools, Canadian School System Navigation',
+    description: 'Various free educational tools',
     icon: 'bi-book',
     details: {
       resources: [
         { title: 'Canadian School System Guide', type: 'PDF Guide', description: 'Comprehensive overview of K-12 education in Canada', fileUrl: 'https://drive.google.com/uc?export=download&id=1vgd_LVDInuD90WVOCpb5LcRXVoiM-Z-E'},
-        { title: 'Parent-Child Activity Kit', type: 'Downloadable', description: 'Fun activities to support language learning and bonding' },
+        { title: "Newcomer's guide", type: 'PDF Guide', description: 'Step-by-step career roadmap for newcomers in Canada.', fileUrl:'https://drive.google.com/file/d/1aaLlS-8XueKFIoPsc2L-MVkSgAwViVEz/view?usp=sharing'},
         { title: 'University Application Workbook', type: 'Interactive PDF', description: 'Step-by-step guide for post-secondary applications',fileUrl:'https://drive.google.com/uc?export=download&id=197-x8heOsgf3ic0ibawpL_sDysOh-Bag' },
         { title: 'Cultural Integration Tips', type: 'Podcast', description: 'Practical advice for navigating Canadian culture', fileUrl: 'https://drive.google.com/drive/folders/1wxigscwbzew8d1rJQeitCIuH8_iTDl-l?usp=drive_link' }
       ],
