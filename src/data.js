@@ -5,10 +5,10 @@ import countryList from "react-select-country-list";
 // ===================================================================================
 
 export const EMAILJS_CONFIG = {
-  serviceId: 'service_7ar5nu7',
-  templateId: 'template_nyy9tj3',
-  imm_templateID: 'template_w73s3yl',
-  publicKey: '3njlzxYwwviO68EmZ',
+  serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID,
+  templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+  imm_templateID: import.meta.env.VITE_EMAILJS_IMM_TEMPLATE_ID,
+  publicKey: import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
 };
 
 export const countryOptions = countryList().getData();
@@ -45,14 +45,15 @@ export const searchIndex = [
 ];
 
 // ===================================================================================
-// SERVICES DATA
+// SERVICES DATA (FINAL)
 // ===================================================================================
 
 export const services = [
   {
     id: 'immigration',
     title: 'Immigration Consulting',
-    description: 'Permanent Residency, Citizenship, Family Sponsorship',
+    description: 'Expert guidance on permanent residency, citizenship, and family sponsorship tailored to your journey.',
+    linkText: 'Learn More', 
     icon: 'bi-file-earmark-text',
     details: {
       process: [
@@ -70,7 +71,8 @@ export const services = [
   {
     id: 'mortgage',
     title: 'Mortgage Finance',
-    description: 'Specialized newcomer mortgage programs, First-time home buyer incentives',
+    description: 'Understand mortgage rules, build your credit profile, and qualify sooner for your first Canadian home.',
+    linkText: 'Learn More',
     icon: 'bi-credit-card',
     details: {
       features: [
@@ -86,8 +88,9 @@ export const services = [
   },
   {
     id: 'coaching',
-    title: 'Life Coaching & Career Development',
-    description: 'Interview Prep, Professional Networking, Confidence Building',
+    title: 'Career & Life Coaching',
+    description: 'Prepare for the job market with resume coaching, interview prep, and confidence-building strategies.',
+    linkText: 'Learn More', 
     icon: 'bi-people',
     details: {
       framework: {
@@ -110,8 +113,10 @@ export const services = [
   },
   {
     id: 'resources',
-    title: 'Educational Resources',
-    description: 'Various free educational tools',
+    title: 'Education & Family',
+    // UPDATED LINE BELOW:
+    description: 'Free and practical tools for navigating the Canadian school system and supporting your family’s success.',
+    linkText: 'Learn More',
     icon: 'bi-book',
     details: {
       resources: [

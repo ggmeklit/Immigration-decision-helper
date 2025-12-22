@@ -97,7 +97,6 @@ const ResourcesPage = () => {
                   </div>
                   <p className="text-muted mb-4">{r.description}</p>
                   <div className="mt-auto">
-                    {/* UPDATED BUTTON: Removed w-100, Added px-4 and size="sm" */}
                     <Button 
                         variant="warning" 
                         size="sm"
@@ -165,6 +164,10 @@ const ResourcesPage = () => {
               <Form.Label>Email Address</Form.Label>
               <Form.Control type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
             </Form.Group>
+            {/* DISCLAIMER ADDED HERE TOO FOR SAFETY */}
+            <p className="text-muted small mb-0" style={{ fontSize: '0.8rem' }}>
+               We may also send other relevant tips or resources. You may opt out anytime.
+            </p>
           </Form>
         </Modal.Body>
         <Modal.Footer className="border-0">
@@ -172,7 +175,7 @@ const ResourcesPage = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* === MODAL 2: JOIN WAITLIST === */}
+      {/* === MODAL 2: JOIN WAITLIST (STUDY PLANS) === */}
       <Modal show={showWaitlistModal} onHide={() => setShowWaitlistModal(false)} centered>
         <Modal.Header closeButton className="border-0">
           <Modal.Title className="fw-bold text-primary-dark-green">Join the Waitlist</Modal.Title>
@@ -188,6 +191,12 @@ const ResourcesPage = () => {
               <Form.Label>Email Address</Form.Label>
               <Form.Control type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required />
             </Form.Group>
+            
+            {/* === NEW DISCLAIMER ADDED HERE === */}
+            <p className="text-muted small mb-0" style={{ fontSize: '0.8rem' }}>
+              We may also send other relevant tips or resources. You may opt out anytime.
+            </p>
+
           </Form>
         </Modal.Body>
         <Modal.Footer className="border-0">

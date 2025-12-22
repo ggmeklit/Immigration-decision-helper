@@ -8,6 +8,9 @@ import { supabase } from "../supabase";
 // Import your data
 import { services, EMAILJS_CONFIG, countryOptions } from '../data';
 
+// *** MAKE.COM WEBHOOK (Newsletter) ***
+const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/72ioesf0f49zbbllsag56nskayr22ts6";
+
 const ImmigrationPage = ({ setActiveTab }) => {
   const service = services.find(s => s.id === 'immigration');
   const [immigrationFormSubmitted, setImmigrationFormSubmitted] = useState(false);
@@ -51,21 +54,33 @@ const ImmigrationPage = ({ setActiveTab }) => {
     }
     setPhoneError("");
 
-    // 2. DATABASE INSERT
+    // 2. PREPARE DATA
     const results = buildImmigrationResults(immigrationFormData);
     const formattedResults = results.map((r, index) => `${index + 1}. ${r.title}\n${r.tagline}\nWhy: ${r.why}\nNext: ${r.next}`).join("\n\n");
 
+    // 3. DATABASE INSERT (Supabase)
     if (supabase) {
       try {
         await supabase.from("immigration_forms").insert([{ full_name: immigrationFormData.fullName, email: immigrationFormData.email, phone: immigrationFormData.phone, age: immigrationFormData.age, education: immigrationFormData.education, work_experience: immigrationFormData.workExperience, language: immigrationFormData.languageProficiency, current_country: immigrationFormData.currentCountry, intended_province: immigrationFormData.intendedProvince, family_in_canada: immigrationFormData.familyInCanada, budget: immigrationFormData.budget, citizenship: immigrationFormData.citizenship, assessment_result: formattedResults, submitted_at: new Date().toISOString() }]);
       } catch (err) { console.error("Supabase insert error:", err); }
     }
 
-    // 3. EMAIL
+    // 4. EMAIL (EmailJS)
     try {
       await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.imm_templateID, { from_name: immigrationFormData.fullName, from_email: immigrationFormData.email, message: formattedResults }, EMAILJS_CONFIG.publicKey);
     } catch (err) { console.error("EmailJS error:", err); }
 
+
+    // 6. *** ANALYTICS: SEND GOOGLE ANALYTICS EVENT ***
+    // Checks if GA4 is loaded on the page
+    if (window.gtag) {
+      window.gtag('event', 'form_submit', {
+        event_category: 'Immigration',
+        event_label: 'Assessment Completed'
+      });
+    }
+
+    // 7. FINISH
     setImmigrationFormSubmitted(true);
     setHasImmigrationConsent(false);
     setImmigrationFormData({ fullName: "", email: "", age: "", education: "", workExperience: "", languageProficiency: "", currentCountry: "", intendedProvince: "", familyInCanada: "", budget: "", assessment_result: "", phone: "", citizenship:"" });
@@ -84,10 +99,8 @@ const ImmigrationPage = ({ setActiveTab }) => {
         <p className="fs-5 text-muted">{service.description}</p>
       </div>
       
-      {/* === COMPACT INFO SECTION (Side-by-Side to reduce scrolling) === */}
+      {/* INFO SECTION */}
       <Row className="g-4 mb-5">
-        
-        {/* LEFT: Our Process */}
         <Col lg={6}>
             <div className="bg-white rounded-3 p-4 shadow-sm border h-100">
                 <h3 className="fw-bold text-primary-dark-green mb-4 text-center">Our Process</h3>
@@ -107,7 +120,6 @@ const ImmigrationPage = ({ setActiveTab }) => {
             </div>
         </Col>
 
-        {/* RIGHT: Success Stories */}
         <Col lg={6}>
             <div className="bg-light rounded-3 p-4 h-100 border">
                 <h3 className="fw-bold text-primary-dark-green mb-4 text-center">Success Stories</h3>
@@ -133,7 +145,7 @@ const ImmigrationPage = ({ setActiveTab }) => {
         </Col>
       </Row>
 
-      {/* === FORM SECTION (Full Width Bottom) === */}
+      {/* FORM SECTION */}
       <Card className="shadow-lg border-0 p-3 p-md-5" id="immigration-form">
         <Card.Body>
           <div className="text-center mb-5">
@@ -184,7 +196,7 @@ const ImmigrationPage = ({ setActiveTab }) => {
               </Row>
               <Row className="g-3 mb-3">
                 <Form.Group as={Col} md={6}><Form.Label>Country Of Citizenship *</Form.Label><Form.Select name="citizenship" value={immigrationFormData.citizenship} onChange={handleImmigrationInputChange} required><option value="">Select citizenship</option>{countryOptions.filter((c) => c.label !== "Canada").map((c) => (<option key={c.value} value={c.label}>{c.label}</option>))}</Form.Select></Form.Group>
-                <Form.Group as={Col} md={6}><Form.Label>Intended Province *</Form.Label><Form.Select name="intendedProvince" value={immigrationFormData.intendedProvince} onChange={handleImmigrationInputChange} required><option value="">Select province</option><option value="ontario">Ontario</option><option value="bc">BC</option><option value="quebec">Quebec</option><option value="alberta">Alberta</option><option value="manitoba">Manitoba</option><option value="saskatchewan">Saskatchewan</option><option value="nova-scotia">Nova Scotia</option><option value="new-brunswick">New Brunswick</option><option value="pei">PEI</option><option value="newfoundland">Newfoundland</option></Form.Select></Form.Group>
+                <Form.Group as={Col} md={6}><Form.Label>Intended Province *</Form.Label><Form.Select name="intendedProvince" value={immigrationFormData.intendedProvince} onChange={handleImmigrationInputChange} required><option value="">Select province</option><option value="ontario">Ontario</option><option value="bc">British Columbia</option><option value="quebec">Quebec</option><option value="alberta">Alberta</option><option value="manitoba">Manitoba</option><option value="saskatchewan">Saskatchewan</option><option value="nova-scotia">Nova Scotia</option><option value="new-brunswick">New Brunswick</option><option value="pei">Prince Edward Island</option><option value="newfoundland">Newfoundland</option></Form.Select></Form.Group>
               </Row>
               <Row className="g-3 mb-4">
                  <Form.Group as={Col} md={6}><Form.Label>Family in Canada? *</Form.Label><Form.Select name="familyInCanada" value={immigrationFormData.familyInCanada} onChange={handleImmigrationInputChange} required><option value="">Select</option><option value="yes">Yes</option><option value="no">No</option></Form.Select></Form.Group>
@@ -199,6 +211,7 @@ const ImmigrationPage = ({ setActiveTab }) => {
                   <li>May contain outdated information — always verify on official sites</li>
                   <li>Your data is collected for this assessment and may be stored securely to improve our services.</li>
                   <li>For definitive advice, consult a licensed RCIC or immigration lawyer.</li>
+                  <li>We may occasionally send you related news, tips or promotions.You may opt out at anytime.</li>
                 </ul>
               </Alert>
 

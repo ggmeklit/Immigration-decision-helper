@@ -8,6 +8,9 @@ import { supabase } from "../supabase";
 // Import data and helpers
 import { services, EMAILJS_CONFIG, formatCurrencyCA } from '../data';
 
+// *** MAKE.COM WEBHOOK (Newsletter) ***
+const MAKE_WEBHOOK_URL = "https://hook.us2.make.com/72ioesf0f49zbbllsag56nskayr22ts6";
+
 const MortgagePage = () => {
   const service = services.find(s => s.id === 'mortgage');
   const [mortgageFormSubmitted, setMortgageFormSubmitted] = useState(false);
@@ -90,11 +93,11 @@ const MortgagePage = () => {
     }
     setPhoneError("");
 
-    // --- NEW: Generate Results FIRST so we can save to DB ---
+    // --- Generate Results ---
     const results = buildMortgageResults(mortgageFormData);
     const msg = results.map(r => `${r.title}\n${r.tagline}\nWhy: ${r.why}\nNext: ${r.next}\n${r.approxMortgage || ''}\n${r.approxPurchase || ''}`).join("\n\n------------------------\n\n");
 
-    // 2. DATABASE INSERT
+    // 2. DATABASE INSERT (Supabase)
     if (supabase) {
       try {
         const { error } = await supabase.from("mortgage_forms").insert([
@@ -110,24 +113,30 @@ const MortgagePage = () => {
             property_type: mortgageFormData.propertyType,     
             first_time_buyer: mortgageFormData.firstTimeBuyer,
             annual_income: mortgageFormData.annualIncome, 
-            assessment_result: msg, // <--- SAVING THE EMAIL RESULT TO DATABASE
+            assessment_result: msg, 
             submitted_at: new Date().toISOString() 
           }
         ]);
-        
-        if (error) {
-            console.error("Supabase Error Details:", error);
-            alert("Database Error: " + error.message);
-            return; 
-        }
+        if (error) console.error("Supabase Error Details:", error);
       } catch (err) { console.error("Supabase error (mortgage):", err); }
     }
 
-    // 3. SEND EMAIL (Using the same 'msg')
+    // 3. EMAIL (EmailJS)
     try {
       await emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.imm_templateID, { from_name: mortgageFormData.fullName, from_email: mortgageFormData.email, message: msg }, EMAILJS_CONFIG.publicKey);
     } catch (err) { console.error("EmailJS Error", err); }
+
+
+    // 5. *** ANALYTICS: SEND GOOGLE ANALYTICS EVENT ***
+    // Checks if GA4 is loaded on the page
+    if (window.gtag) {
+      window.gtag('event', 'form_submit', {
+        event_category: 'Mortgage',
+        event_label: 'Assessment Completed'
+      });
+    }
     
+    // 6. FINISH
     setMortgageFormSubmitted(true);
   };
 
@@ -145,14 +154,11 @@ const MortgagePage = () => {
         <p className="fs-5 text-muted">{service.description}</p>
       </div>
 
-      {/* === COMPACT INFO SECTION (Side-by-Side) === */}
+      {/* COMPACT INFO SECTION */}
       <Row className="g-4 mb-5">
-        
-        {/* LEFT: Why Choose Us (Features) */}
         <Col lg={6}>
             <div className="bg-white rounded-3 p-4 shadow-sm border h-100">
                 <h3 className="fw-bold text-primary-dark-green mb-4 text-start">Why Choose Our Mortgage Services?</h3>
-                
                 <div className="d-flex flex-column gap-3">
                     {service.details.features.map((f, i) => (
                         <div key={i} className="d-flex align-items-center">
@@ -163,8 +169,6 @@ const MortgagePage = () => {
                 </div>
             </div>
         </Col>
-
-        {/* RIGHT: Frequently Asked Questions (FAQ) */}
         <Col lg={6}>
             <div className="bg-light rounded-3 p-4 h-100 border">
                 <h3 className="fw-bold text-primary-dark-green mb-4 text-center">Frequently Asked Questions</h3>
@@ -182,7 +186,7 @@ const MortgagePage = () => {
         </Col>
       </Row>
 
-      {/* === FORM SECTION (Full Width Bottom) === */}
+      {/* FORM SECTION */}
       <Card className="shadow-lg border-0 p-4 p-md-5" id="mortgage-form">
         <Card.Body>
           <div className="text-center mb-5">
@@ -227,7 +231,7 @@ const MortgagePage = () => {
                   <Form.Group as={Col} md={6}><Form.Label>Property Type *</Form.Label><Form.Select name="propertyType" value={mortgageFormData.propertyType} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="detached">Detached</option><option value="townhouse">Townhouse</option><option value="condo">Condo</option></Form.Select></Form.Group>
               </Row>
               <Row className="g-3 mb-3">
-                  <Form.Group as={Col} md={6}><Form.Label>Preferred Property Location *</Form.Label><Form.Select name="propertyLocation" value={mortgageFormData.propertyLocation} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="toronto-gta">Toronto & GTA</option><option value="vancouver">Vancouver</option><option value="other">Other</option></Form.Select></Form.Group>
+                  <Form.Group as={Col} md={6}><Form.Label>Preferred Property Location *</Form.Label><Form.Select name="propertyLocation" value={mortgageFormData.propertyLocation} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="toronto-gta">Toronto-gta</option><option value="vancouver">Vancouver</option><option value="other">Other</option></Form.Select></Form.Group>
                   <Form.Group as={Col} md={6}><Form.Label>First-Time Buyer? *</Form.Label><Form.Select name="firstTimeBuyer" value={mortgageFormData.firstTimeBuyer} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></Form.Select></Form.Group>
               </Row>
               <Form.Group className="mb-4"><Form.Label>Are you Newcomer to Canada? *</Form.Label><Form.Select name="newcomerStatus" value={mortgageFormData.newcomerStatus} onChange={handleMortgageInputChange} required><option value="">Select...</option><option value="permanent-resident">Permanent Resident</option><option value="work-permit">Work Permit</option><option value="planning-to-immigrate">Planning to Immigrate</option></Form.Select></Form.Group>
@@ -240,6 +244,7 @@ const MortgagePage = () => {
                   <li>Results are estimates only and can change based on full underwriting and documentation.</li>
                   <li>Your data is collected securely and may be stored to help improve our services.</li>
                   <li>For firm approval, speak directly with a licensed mortgage professional.</li>
+                  <li>We may occasionally send you related news, tips or promotions.You may opt out at anytime.</li>
                 </ul>
               </Alert>
 

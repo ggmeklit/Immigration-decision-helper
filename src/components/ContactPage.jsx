@@ -33,7 +33,22 @@ const ContactPage = () => {
                 <Col md={6}><Form.Group><Form.Label>Email</Form.Label><Form.Control type="email" value={contactForm.email} onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))} required /></Form.Group></Col>
                 <Col md={12}><Form.Group><Form.Label>Phone</Form.Label><Form.Control type="tel" value={contactForm.phone} onChange={(e) => setContactForm(prev => ({ ...prev, phone: e.target.value }))} /></Form.Group></Col>
                 <Col md={12}><Form.Group><Form.Label>Service</Form.Label><Form.Select value={contactForm.service} onChange={(e) => setContactForm(prev => ({ ...prev, service: e.target.value }))} required><option value="">Select...</option>{services.map(s => <option key={s.id} value={s.title}>{s.title}</option>)}</Form.Select></Form.Group></Col>
-                <Col md={12}><Form.Group><Form.Label>Message</Form.Label><Form.Control as="textarea" rows={4} value={contactForm.message} onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))} required /></Form.Group></Col>
+                
+                {/* ADDED PLACEHOLDER HERE */}
+                <Col md={12}>
+                  <Form.Group>
+                    <Form.Label>Message</Form.Label>
+                    <Form.Control 
+                      as="textarea" 
+                      rows={4} 
+                      placeholder="Please describe the type of help you require" 
+                      value={contactForm.message} 
+                      onChange={(e) => setContactForm(prev => ({ ...prev, message: e.target.value }))} 
+                      required 
+                    />
+                  </Form.Group>
+                </Col>
+                
                 <Col md={12} className="d-grid"><Button variant="main" type="submit" size="lg" disabled={contactSending}>{contactSending ? 'Sending…' : 'Submit Inquiry'}</Button></Col>
               </Row>
             </Form>
