@@ -53,7 +53,7 @@ export const services = [
     id: 'immigration',
     title: 'Immigration Consulting',
     description: 'Expert guidance on permanent residency, citizenship, and family sponsorship tailored to your journey.',
-    linkText: 'Learn More', 
+    linkText: 'Check Eligibility', 
     icon: 'bi-file-earmark-text',
     details: {
       process: [
@@ -72,7 +72,7 @@ export const services = [
     id: 'mortgage',
     title: 'Mortgage Finance',
     description: 'Understand mortgage rules, build your credit profile, and qualify sooner for your first Canadian home.',
-    linkText: 'Learn More',
+    linkText: 'Get Pre-Approved',
     icon: 'bi-credit-card',
     details: {
       features: [
@@ -90,7 +90,7 @@ export const services = [
     id: 'coaching',
     title: 'Career & Life Coaching',
     description: 'Prepare for the job market with resume coaching, interview prep, and confidence-building strategies.',
-    linkText: 'Learn More', 
+    linkText: 'View Coaching Plans', 
     icon: 'bi-people',
     details: {
       framework: {
@@ -116,7 +116,7 @@ export const services = [
     title: 'Education & Family',
     // UPDATED LINE BELOW:
     description: 'Free and practical tools for navigating the Canadian school system and supporting your family’s success.',
-    linkText: 'Learn More',
+    linkText: 'Browse Resources',
     icon: 'bi-book',
     details: {
       resources: [
