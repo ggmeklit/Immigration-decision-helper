@@ -14,7 +14,7 @@ const HomePage = ({ setActiveTab, goTo, setShowBookingModal, setShowResourcesCho
             <Col lg={6}>
               <h1 className="display-4 fw-bold mb-4">Your Bridge to Thriving in Canada</h1>
               <p className="fs-5 mb-4 opacity-90">
-                Personalized immigration guidance, career and education support, and newcomer‑friendly mortgage advice—so you can build a stable, successful life in Canada.
+                Personalized immigration guidance, coaching and education support—so you can build a stable and successful life in Canada.
               </p>
               
               {/* === THE CLEAN 3-BUTTON LAYOUT === */}
@@ -31,7 +31,7 @@ const HomePage = ({ setActiveTab, goTo, setShowBookingModal, setShowResourcesCho
               </div>
             </Col>
             <Col lg={6}>
-              <img src={keyMoment} alt="Newcomers in Canada" className="img-fluid rounded-3" style={{ width: "100%", height: "auto", objectFit: "cover" }} />
+              <img src={keyMoment} alt="Diverse group of newcomers smiling and holding Canadian flags with the Toronto skyline in the background" className="img-fluid rounded-3" style={{ width: "100%", height: "auto", objectFit: "cover" }} />
             </Col>
           </Row>
         </Container>
@@ -43,11 +43,11 @@ const HomePage = ({ setActiveTab, goTo, setShowBookingModal, setShowResourcesCho
           <div className="text-center mb-5">
             <h2 className="display-5 fw-bold text-primary-dark-green mb-3">Support for Every Stage of Your Journey</h2>
             <p className="fs-5 text-muted mx-auto" style={{ maxWidth: '48rem' }}>
-              Whether you’re planning your move, newly arrived, or ready to buy your first home, ThriveBridge gives you step‑by‑step support to navigate life in Canada.
+              Whether you’re planning your move, newly arrived, or seeking career and education support, ThriveBridge gives you step‑by‑step support to navigate life in Canada.
             </p>
           </div>
           
-          <Row xs={1} md={2} lg={4} className="g-4">
+          <Row xs={1} md={2} lg={3} className="g-4 justify-content-center">
             {services.map((service) => (
               <Col key={service.id}>
                 <Card className="h-100 shadow-sm border-light card-hover" onClick={() => goTo(service.id)} style={{ cursor: 'pointer' }}>
@@ -82,7 +82,7 @@ const HomePage = ({ setActiveTab, goTo, setShowBookingModal, setShowResourcesCho
               </Button>
             </Col>
             <Col lg={6}>
-              <img src="/community_hub.jpg" alt="Community hub" className="img-fluid rounded-3" style={{ width: "100%", height: "400px", objectFit: "cover" }} />
+              <img src="/community_hub.jpg" alt="A diverse group of community members and experts looking at a map of Canada together in a bright office" className="img-fluid rounded-3" style={{ width: "100%", height: "400px", objectFit: "cover" }} />
             </Col>
           </Row>
         </Container>

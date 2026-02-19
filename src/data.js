@@ -25,17 +25,17 @@ export const formatCurrencyCA = (value) =>
 // ===================================================================================
 
 export const navigation = [
-  { name: 'Home', id: 'home' }, { name: 'Immigration', id: 'immigration' }, { name: 'Mortgage', id: 'mortgage' },
+  { name: 'Home', id: 'home' }, { name: 'Immigration', id: 'immigration' }, /* { name: 'Mortgage', id: 'mortgage' }, */
   { name: 'Coaching', id: 'coaching' }, { name: 'Resources', id: 'resources' }, { name: 'About', id: 'about' },
   { name: 'Contact', id: 'contact' }
 ];
 
 export const searchIndex = [
   { keyword: 'home', target: 'home' }, { keyword: 'about', target: 'about' }, { keyword: 'mission', target: 'about' },
-  { keyword: 'contact', target: 'contact' }, { keyword: 'immigration', target: 'immigration' }, { keyword: 'mortgage', target: 'mortgage' },
+  { keyword: 'contact', target: 'contact' }, { keyword: 'immigration', target: 'immigration' }, /* { keyword: 'mortgage', target: 'mortgage' }, */
   { keyword: 'coaching', target: 'coaching' }, { keyword: 'resources', target: 'resources' },
-  { keyword: 'first-time home buyer', target: 'mortgage' }, { keyword: 'first time buyer', target: 'mortgage' },
-  { keyword: 'credit', target: 'mortgage' }, { keyword: 'study plan', target: 'resources' }, { keyword: 'education', target: 'resources' },
+  /* { keyword: 'first-time home buyer', target: 'mortgage' }, { keyword: 'first time buyer', target: 'mortgage' },
+  { keyword: 'credit', target: 'mortgage' }, */ { keyword: 'study plan', target: 'resources' }, { keyword: 'education', target: 'resources' },
   { keyword: 'maria rodriguez', target: 'immigration' }, { keyword: 'ahmed hassan', target: 'immigration' },
   { keyword: 'sarah johnson', target: 'coaching' }, { keyword: 'michael chen', target: 'coaching' }, { keyword: 'aisha patel', target: 'coaching' },
   { keyword: 'thrive', target: 'home' }, { keyword: 'thrivebridge', target: 'home' },
@@ -67,7 +67,7 @@ export const services = [
         { name: 'Ahmed Hassan', text: 'From consultation to approval, the team was professional, responsive, and genuinely caring.' }
       ]
     }
-  },
+  } /*,
   {
     id: 'mortgage',
     title: 'Mortgage Finance',
@@ -85,7 +85,7 @@ export const services = [
         { question: 'How long does approval take?', answer: 'Pre-approval typically takes 24-48 hours once all documents are submitted.' }
       ]
     }
-  },
+  }*/,
   {
     id: 'coaching',
     title: 'Career & Life Coaching',

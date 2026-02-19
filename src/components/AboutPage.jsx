@@ -22,7 +22,6 @@ const AboutPage = () => (
         <h6 className="fw-bold text-primary-dark-green">Services include:</h6>
         <ul className="text-muted mb-4">
           <li className="mb-1">End-to-end immigration advice from licensed professionals</li>
-          <li className="mb-1">Customized mortgage assistance</li>
           <li className="mb-1">Expert coaching services in career, life, and leadership</li>
         </ul>
 
@@ -37,7 +36,7 @@ const AboutPage = () => (
         </Card>
       </Col>
       <Col lg={6}>
-        <img src="/About_us.jpg" alt="Team and mission" className="img-fluid rounded-3" style={{ width: "100%", height: "400px", objectFit: "cover" }} />
+        <img src="/About_us.jpg" alt="The ThriveBridge expert immigration and career coaching team standing together in a professional office" className="img-fluid rounded-3" style={{ width: "100%", height: "400px", objectFit: "cover" }} />
       </Col>
     </Row>
 

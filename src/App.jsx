@@ -8,7 +8,7 @@ import { navigation, searchIndex } from './data';
 // 2. IMPORT COMPONENTS
 import HomePage from './components/HomePage';
 import ImmigrationPage from './components/ImmigrationPage';
-import MortgagePage from './components/MortgagePage';
+//import MortgagePage from './components/MortgagePage';
 import CoachingPage from './components/CoachingPage';
 import ResourcesPage from './components/ResourcesPage';
 import AboutPage from './components/AboutPage';
@@ -160,9 +160,9 @@ const App = () => {
         <div style={{ display: activeTab === 'immigration' ? 'block' : 'none' }}>
           <ImmigrationPage />
         </div>
-        <div style={{ display: activeTab === 'mortgage' ? 'block' : 'none' }}>
+        {/*<div style={{ display: activeTab === 'mortgage' ? 'block' : 'none' }}>
           <MortgagePage />
-        </div>
+        </div>*/}
         <div style={{ display: activeTab === 'coaching' ? 'block' : 'none' }}>
           <CoachingPage setActiveTab={setActiveTab} />
         </div>
@@ -236,7 +236,7 @@ const App = () => {
           <div className="d-grid gap-3">
             <Button variant="main" size="lg" href={CALENDLY_URL} target="_blank">Immigration Consultation</Button>
             {/* RENAMED BUTTON BELOW */}
-            <Button variant="main" size="lg" href={CALENDLY_URL} target="_blank">Mortgage Advice Session</Button>
+            {/*<Button variant="main" size="lg" href={CALENDLY_URL} target="_blank">Mortgage Advice Session</Button>*/}
             <Button variant="main" size="lg" href={CALENDLY_URL} target="_blank">Career & Life Coaching</Button>
           </div>
           <div className="mt-4 pt-3 border-top">
@@ -254,7 +254,7 @@ const App = () => {
         <Modal.Body className="p-4 bg-light">
           <Row className="g-4">
              {/* OPTION A: IMMIGRATION */}
-             <Col md={4}>
+             <Col md={6}>
                 <Card className="h-100 border-0 shadow-sm text-center">
                     <Card.Body className="d-flex flex-column">
                         <div className="text-primary-dark-green fs-1 mb-2"><i className="bi bi-globe-americas"></i></div>
@@ -268,6 +268,7 @@ const App = () => {
              </Col>
              
              {/* OPTION B: MORTGAGE */}
+             {/*}
              <Col md={4}>
                 <Card className="h-100 border-0 shadow-sm text-center">
                     <Card.Body className="d-flex flex-column">
@@ -280,9 +281,10 @@ const App = () => {
                     </Card.Body>
                 </Card>
              </Col>
+             */}
 
              {/* OPTION C: EDUCATION */}
-             <Col md={4}>
+             <Col md={6}>
                 <Card className="h-100 border-0 shadow-sm text-center">
                     <Card.Body className="d-flex flex-column">
                         <div className="text-primary-dark-green fs-1 mb-2"><i className="bi bi-journal-bookmark"></i></div>
