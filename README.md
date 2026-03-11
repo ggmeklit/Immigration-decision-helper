@@ -5,7 +5,7 @@
 
 ## 🎓 **Capstone Project Completion**
 
-After months of research, design, engineering, and collaboration, we’re proud to share our capstone project: **ThriveBridge.ca**, a digital platform built to empower global citizens navigating the journey of immigration, financial readiness, and career development in Canada.
+After months of research, design, engineering and collaboration, we’re proud to share our capstone project: **ThriveBridge.ca**, a digital platform built to empower global citizens navigating the journey of immigration, financial readiness, and career development in Canada.
 
 This project was more than a website — it was our attempt to solve a deeply human problem:
 
